@@ -1,7 +1,10 @@
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 
 import { isEmpty } from '@/utils'
 import { getStorge } from '@/utils/storge.ts'
+
+const whiteList = new Set(['/login', '/register'])
 
 export function createInstance() {
   const instance = axios.create({
@@ -10,7 +13,7 @@ export function createInstance() {
   })
 
   const token = getStorge('token')
-  if (isEmpty(token)) {
+  if (isEmpty(token) && !whiteList.has(new URL(window.location.href).pathname)) {
     if (__DEV__) {
       console.error('Token is empty, redirecting to login page')
     }

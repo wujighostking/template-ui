@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { User, Lock, ChatDotRound, ChatLineRound, Postcard, Check } from '@element-plus/icons-vue'
+import { Iphone, Lock, ChatDotRound, ChatLineRound, Postcard, Check } from '@element-plus/icons-vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { login } from '@/api/login'
+
 interface LoginForm {
-  username: string
+  phone: string
   password: string
 }
 
@@ -15,14 +17,18 @@ const loading = ref(false)
 const remember = ref(true)
 
 const form = reactive<LoginForm>({
-  username: '',
+  phone: '',
   password: '',
 })
 
 const rules: FormRules<LoginForm> = {
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 3, max: 20, message: '用户名长度在 3 到 20 个字符', trigger: 'blur' },
+  phone: [
+    { required: true, message: '请输入手机号码', trigger: 'blur' },
+    {
+      pattern: /^1[3-9]\d{9}$/,
+      message: '请输入正确的手机号码',
+      trigger: 'blur',
+    },
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
@@ -37,9 +43,18 @@ async function handleLogin() {
     loading.value = true
     try {
       // TODO: 调用登录接口
-      await new Promise((resolve) => setTimeout(resolve, 800))
+      // await new Promise((resolve) => setTimeout(resolve, 800))
+
+      await login({ ...form })
+
       ElMessage.success('登录成功')
       await router.push('/')
+    } catch (error) {
+      if (__DEV__) {
+        console.error('登录失败', error)
+      }
+
+      ElMessage.error('登录失败，请检查手机号码或密码')
     } finally {
       loading.value = false
     }
@@ -69,10 +84,10 @@ function handleThirdPartyLogin(type: string) {
         size="large"
         @keyup.enter="handleLogin"
       >
-        <el-form-item prop="username">
-          <el-input v-model="form.username" placeholder="请输入用户名" clearable>
+        <el-form-item prop="phone">
+          <el-input v-model="form.phone" placeholder="请输入手机号码" maxlength="11" clearable>
             <template #prefix>
-              <el-icon><User /></el-icon>
+              <el-icon><Iphone /></el-icon>
             </template>
           </el-input>
         </el-form-item>
