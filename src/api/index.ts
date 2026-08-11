@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { useRouter } from 'vue-router'
 
 import { isEmpty } from '@/utils'
 import { getStorge } from '@/utils/storge.ts'
@@ -8,7 +7,7 @@ const whiteList = new Set(['/login', '/register'])
 
 export function createInstance() {
   const instance = axios.create({
-    baseURL: import.meta.env.BASE_URL,
+    baseURL: import.meta.env.VITE_API_BASE_URL,
     timeout: 10000,
   })
 
