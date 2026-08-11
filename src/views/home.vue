@@ -24,12 +24,12 @@ const route = useRoute()
 const activeMenu = computed(() => route.path)
 
 const menus: MenuItem[] = [
-  { index: '/home/dashboard', title: '首页', icon: 'House' },
-  { index: '/home/user', title: '用户管理', icon: 'User' },
-  { index: '/home/goods', title: '商品管理', icon: 'Goods' },
-  { index: '/home/order', title: '订单管理', icon: 'Document' },
-  { index: '/home/statistics', title: '数据统计', icon: 'DataAnalysis' },
-  { index: '/home/settings', title: '系统设置', icon: 'Setting' },
+  { index: '/dashboard', title: '首页', icon: 'House' },
+  { index: '/user', title: '用户管理', icon: 'User' },
+  { index: '/goods', title: '商品管理', icon: 'Goods' },
+  { index: '/order', title: '订单管理', icon: 'Document' },
+  { index: '/statistics', title: '数据统计', icon: 'DataAnalysis' },
+  { index: '/settings', title: '系统设置', icon: 'Setting' },
 ]
 
 const icons: Record<string, Component> = {
