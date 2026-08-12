@@ -1,9 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import { whiteList } from '@/common/constants'
 import { isEmpty } from '@/utils'
-import { getStorge } from '@/utils/storge.ts'
-
-const whiteList = new Set(['/login', '/register'])
+import { getStorage } from '@/utils/storage'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -57,7 +56,7 @@ const router = createRouter({
 
 // 前置路由导航守卫：token 不存在或为空时跳转到登录页
 router.beforeEach((to) => {
-  const token = getStorge('token')
+  const token = getStorage('token')
 
   // 白名单（如登录/注册页）直接放行
   if (whiteList.has(to.path)) {

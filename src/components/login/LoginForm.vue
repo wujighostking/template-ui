@@ -5,9 +5,10 @@ import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { login } from '@/api/login'
+import { setStorage } from '@/utils/storage'
 
 interface LoginForm {
-  phone: string
+  phoneNumber: string
   password: string
 }
 
@@ -17,12 +18,12 @@ const loading = ref(false)
 const remember = ref(true)
 
 const form = reactive<LoginForm>({
-  phone: '',
-  password: '',
+  phoneNumber: '13066344495',
+  password: '123456',
 })
 
 const rules: FormRules<LoginForm> = {
-  phone: [
+  phoneNumber: [
     { required: true, message: '请输入手机号码', trigger: 'blur' },
     {
       pattern: /^1[3-9]\d{9}$/,
@@ -36,28 +37,34 @@ const rules: FormRules<LoginForm> = {
   ],
 }
 
-async function handleLogin() {
+function handleLogin() {
   if (!loginFormRef.value) return
-  await loginFormRef.value.validate(async (valid) => {
+  loginFormRef.value.validate((valid) => {
     if (!valid) return
     loading.value = true
-    try {
-      // TODO: 调用登录接口
-      // await new Promise((resolve) => setTimeout(resolve, 800))
 
-      await login({ ...form })
+    login({ ...form })
+      .then((data: any) => {
+        if (data.code !== 0) {
+          ElMessage.error(data.message || '登录失败，请检查手机号码或密码')
+          return
+        }
 
-      ElMessage.success('登录成功')
-      await router.push('/')
-    } catch (error) {
-      if (__DEV__) {
-        console.error('登录失败', error)
-      }
+        setStorage('token', data.data)
+        ElMessage.success(data.message || '登录成功')
 
-      ElMessage.error('登录失败，请检查手机号码或密码')
-    } finally {
-      loading.value = false
-    }
+        router.push('/')
+      })
+      .catch((error) => {
+        if (__DEV__) {
+          console.error('登录失败', error)
+        }
+
+        ElMessage.error('登录失败，请检查手机号码或密码')
+      })
+      .finally(() => {
+        loading.value = false
+      })
   })
 }
 
@@ -84,8 +91,13 @@ function handleThirdPartyLogin(type: string) {
         size="large"
         @keyup.enter="handleLogin"
       >
-        <el-form-item prop="phone">
-          <el-input v-model="form.phone" placeholder="请输入手机号码" maxlength="11" clearable>
+        <el-form-item prop="phoneNumber">
+          <el-input
+            v-model="form.phoneNumber"
+            placeholder="请输入手机号码"
+            maxlength="11"
+            clearable
+          >
             <template #prefix>
               <el-icon><Iphone /></el-icon>
             </template>

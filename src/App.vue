@@ -1,4 +1,27 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
+
+import { checkToken } from '@/api/login/checkToken'
+import { whiteList } from '@/common/constants'
+import { getStorage, removeStorage } from '@/utils/storage'
+
+function check() {
+  if (whiteList.has(location.pathname)) return
+
+  const router = useRouter()
+  const token = getStorage('token')
+  checkToken(token!).then((data: any) => {
+    if (data.code == 0) return
+
+    ElMessage.error('登录已过期，请重新登录')
+    removeStorage('token')
+    router.replace('/login')
+  })
+}
+
+check()
+</script>
 
 <template>
   <router-view />

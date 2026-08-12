@@ -1,9 +1,8 @@
 import axios from 'axios'
 
+import { whiteList } from '@/common/constants.ts'
 import { isEmpty } from '@/utils'
-import { getStorge } from '@/utils/storge.ts'
-
-const whiteList = new Set(['/login', '/register'])
+import { getStorage } from '@/utils/storage'
 
 export function createInstance() {
   const instance = axios.create({
@@ -11,7 +10,8 @@ export function createInstance() {
     timeout: 10000,
   })
 
-  const token = getStorge('token')
+  const token = getStorage('token')
+
   if (isEmpty(token) && !whiteList.has(new URL(window.location.href).pathname)) {
     if (__DEV__) {
       console.error('Token is empty, redirecting to login page')
