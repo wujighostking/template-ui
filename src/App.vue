@@ -11,7 +11,7 @@ const route = useRoute()
 const router = useRouter()
 
 function check() {
-  if (whiteList.has(location.pathname) || route) return
+  if (whiteList.has(location.pathname)) return
 
   const token = getStorage('token')
   checkToken(token!).then((data: any) => {
