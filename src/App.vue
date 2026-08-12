@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { ElMessage } from 'element-plus'
-import { useRouter } from 'vue-router'
+import { watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import { checkToken } from '@/api/login/checkToken'
 import { whiteList } from '@/common/constants'
 import { getStorage, removeStorage } from '@/utils/storage'
 
-function check() {
-  if (whiteList.has(location.pathname)) return
+const route = useRoute()
+const router = useRouter()
 
-  const router = useRouter()
+function check() {
+  if (whiteList.has(location.pathname) || route) return
+
   const token = getStorage('token')
   checkToken(token!).then((data: any) => {
     if (data.code == 0) return
@@ -20,7 +23,7 @@ function check() {
   })
 }
 
-check()
+watch(() => route.path, check, { immediate: true, flush: 'post' })
 </script>
 
 <template>
