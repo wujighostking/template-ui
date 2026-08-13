@@ -1,8 +1,9 @@
-import type { AxiosInstance, AxiosResponse } from 'axios'
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import axios from 'axios'
 
 import { CODE } from '@/common/code.ts'
 import { whiteList } from '@/common/constants.ts'
+import type { RequestArgs } from '@/schema/request.ts'
 import type { Response } from '@/schema/response.ts'
 import { isEmpty } from '@/utils'
 import { getStorage } from '@/utils/storage'
@@ -55,10 +56,45 @@ export function createInstance(): AxiosInstance {
 }
 
 const _request = createInstance()
-function request(...args: Parameters<typeof _request>): Promise<Response> {
-  return _request(...args).then(
-    (response) => response.data,
-    (error) => Promise.reject(error),
-  )
+
+/** 请求缓存，key 由 url 与请求参数拼接而成 */
+const cache = new Map<string, Promise<Response>>()
+
+/** 参数归一化：将 (url, config?) 或 (config) 归一化为统一的 config 字符串 */
+function normalizeConfig(...args: Parameters<typeof _request>): string {
+  const [configOrUrl, maybeConfig] = args
+  const config: AxiosRequestConfig =
+    typeof configOrUrl === 'string' ? { ...maybeConfig, url: configOrUrl } : configOrUrl
+  return JSON.stringify(config)
+}
+
+function request(config: AxiosRequestConfig, isCache?: boolean): Promise<Response>
+function request(url: string, config?: AxiosRequestConfig, isCache?: boolean): Promise<Response>
+
+function request(...args: [...RequestArgs, isCache?: boolean]): Promise<Response> {
+  const isCache = args.at(-1) !== false
+  const requestArgs = args.slice(0, -1) as Parameters<typeof _request>
+
+  const key = normalizeConfig(...requestArgs)
+
+  if (isCache && cache.has(key)) {
+    return cache.get(key)!
+  }
+
+  const promise = _request(...requestArgs)
+    .then((response) => response.data)
+    .catch((error) => {
+      if (__DEV__) {
+        console.error(error)
+      }
+      return Promise.reject(error)
+    })
+    .finally(() => isCache && cache.delete(key))
+
+  if (isCache) {
+    cache.set(key, promise)
+  }
+
+  return promise
 }
 export { request as default, request }
