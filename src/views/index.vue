@@ -55,6 +55,7 @@ import AdminHeader from '@/components/AdminHeader.vue'
       flex: 1;
       padding: 16px;
       overflow-y: auto;
+      height: 100%;
 
       .content-card {
         background: transparent;
@@ -66,6 +67,7 @@ import AdminHeader from '@/components/AdminHeader.vue'
 
         :deep(.el-card__body) {
           padding: 8px;
+          overflow: hidden;
         }
       }
     }
