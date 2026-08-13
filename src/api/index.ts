@@ -1,5 +1,6 @@
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import axios from 'axios'
+import { types } from 'sass'
 
 import { CODE } from '@/common/code.ts'
 import { whiteList } from '@/common/constants.ts'
@@ -7,6 +8,8 @@ import type { RequestArgs } from '@/schema/request.ts'
 import type { Response } from '@/schema/response.ts'
 import { isEmpty } from '@/utils'
 import { getStorage } from '@/utils/storage'
+import { isBoolean, isString } from '@/utils/types.ts'
+import Boolean = types.Boolean
 
 export function createInstance(): AxiosInstance {
   const instance = axios.create({
@@ -14,9 +17,7 @@ export function createInstance(): AxiosInstance {
     timeout: 10000,
   })
 
-  const token = getStorage('token')
-
-  if (isEmpty(token) && !whiteList.has(new URL(window.location.href).pathname)) {
+  if (isEmpty(getStorage('token')) && !whiteList.has(new URL(window.location.href).pathname)) {
     if (__DEV__) {
       console.error('Token is empty, redirecting to login page')
     }
@@ -28,7 +29,7 @@ export function createInstance(): AxiosInstance {
 
   instance.interceptors.request.use(
     (config) => {
-      config.headers['Authorization'] = `Bearer ${token}`
+      config.headers['Authorization'] = `Bearer ${getStorage('token')}`
       return config
     },
     (error) => {
@@ -63,17 +64,19 @@ const cache = new Map<string, Promise<Response>>()
 /** 参数归一化：将 (url, config?) 或 (config) 归一化为统一的 config 字符串 */
 function normalizeConfig(...args: Parameters<typeof _request>): string {
   const [configOrUrl, maybeConfig] = args
-  const config: AxiosRequestConfig =
-    typeof configOrUrl === 'string' ? { ...maybeConfig, url: configOrUrl } : configOrUrl
+  const config: AxiosRequestConfig = isString(configOrUrl)
+    ? { ...maybeConfig, url: configOrUrl }
+    : configOrUrl
   return JSON.stringify(config)
 }
 
 function request(config: AxiosRequestConfig, isCache?: boolean): Promise<Response>
 function request(url: string, config?: AxiosRequestConfig, isCache?: boolean): Promise<Response>
 
-function request(...args: [...RequestArgs, isCache?: boolean]): Promise<Response> {
-  const isCache = args.at(-1) !== false
-  const requestArgs = args.slice(0, -1) as Parameters<typeof _request>
+async function request(...args: [...RequestArgs, isCache?: boolean]): Promise<Response> {
+  const last = args.at(-1)
+  const isCache = isBoolean(last) ? last : true
+  const requestArgs = (isBoolean(last) ? args.slice(0, -1) : args) as Parameters<typeof _request>
 
   const key = normalizeConfig(...requestArgs)
 
@@ -87,6 +90,7 @@ function request(...args: [...RequestArgs, isCache?: boolean]): Promise<Response
       if (__DEV__) {
         console.error(error)
       }
+
       return Promise.reject(error)
     })
     .finally(() => isCache && cache.delete(key))
