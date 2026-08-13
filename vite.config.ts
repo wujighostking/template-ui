@@ -18,10 +18,11 @@ export default defineConfig({
     vueDevTools(),
 
     AutoImport({
+      imports: ['vue', 'vue-router'],
       resolvers: [ElementPlusResolver()],
     }),
     Components({
-      resolvers: [ElementPlusResolver()],
+      resolvers: [ElementPlusResolver({ importStyle: true })],
     }),
   ],
   resolve: {

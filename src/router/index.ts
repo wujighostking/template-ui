@@ -1,8 +1,10 @@
+import { ElMessage } from 'element-plus'
 import { createRouter, createWebHistory } from 'vue-router'
 
+import { checkToken } from '@/api/login/checkToken'
 import { whiteList } from '@/common/constants'
 import { isEmpty } from '@/utils'
-import { getStorage } from '@/utils/storage'
+import { getStorage, removeStorage } from '@/utils/storage'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -88,17 +90,32 @@ const router = createRouter({
   ],
 })
 
-// 前置路由导航守卫：token 不存在或为空时跳转到登录页
-router.beforeEach((to) => {
-  const token = getStorage('token')
-
+// 前置路由导航守卫：校验 token 存在性及有效性，未通过时跳转到登录页
+router.beforeEach(async (to) => {
   // 白名单（如登录/注册页）直接放行
   if (whiteList.has(to.path)) {
     return true
   }
 
+  const token = getStorage('token')
+
+  // token 不存在或为空时跳转到登录页
   if (isEmpty(token)) {
     return { path: '/login' }
+  }
+
+  // token 已失效时清空并跳转到登录页
+  try {
+    const data: any = await checkToken(token!)
+    if (data.code != 0) {
+      ElMessage.error('登录已过期，请重新登录')
+      removeStorage('token')
+      return { path: '/login' }
+    }
+  } catch {
+    // 校验接口异常时阻断导航，并提示
+    ElMessage.error('接口异常，请重试')
+    return false
   }
 
   return true
