@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import { CODE } from '@/common/code.ts'
-import { EMPTY_OBJ, whiteList } from '@/common/constants.ts'
+import { whiteList } from '@/common/constants.ts'
 import { isEmpty } from '@/utils'
 import { getStorage } from '@/utils/storage'
 
@@ -35,8 +35,8 @@ export function createInstance() {
 
   instance.interceptors.response.use(
     (response) => {
-      const data = response.data ?? EMPTY_OBJ
-      if (data.code === CODE.UNAUTHORIZED) {
+      const data = response.data
+      if (data?.code === CODE.UNAUTHORIZED) {
         window.location.href = '/login'
         return
       }
