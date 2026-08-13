@@ -1,16 +1,12 @@
 <script setup lang="ts">
-import { Iphone, Lock, ChatDotRound, ChatLineRound, Postcard, Check } from '@element-plus/icons-vue'
+import { ChatDotRound, ChatLineRound, Check, Iphone, Lock, Postcard } from '@element-plus/icons-vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { login } from '@/api/login'
+import type { LoginForm } from '@/schema/loginForm'
 import { setStorage } from '@/utils/storage'
-
-interface LoginForm {
-  phoneNumber: string
-  password: string
-}
 
 const router = useRouter()
 const loginFormRef = ref<FormInstance>()
@@ -44,7 +40,7 @@ function handleLogin() {
     loading.value = true
 
     login({ ...form })
-      .then((data: any) => {
+      .then((data) => {
         if (data.code !== 0) {
           ElMessage.error(data.message || '登录失败，请检查手机号码或密码')
           return

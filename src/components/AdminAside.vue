@@ -1,31 +1,26 @@
 <script setup lang="ts">
 import {
-  User,
-  Setting,
-  Key,
-  Menu as MenuIcon,
-  OfficeBuilding,
-  Postcard,
-  Notebook,
-  Monitor,
-  Odometer,
   BellFilled,
-  Timer,
+  Connection,
   DataLine,
-  Tools,
   DocumentCopy,
   EditPen,
-  Connection,
+  Key,
+  Menu as MenuIcon,
+  Monitor,
+  Notebook,
+  Odometer,
+  OfficeBuilding,
+  Postcard,
+  Setting,
+  Timer,
+  Tools,
+  User,
 } from '@element-plus/icons-vue'
 import { type Component, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-interface MenuItem {
-  index: string
-  title: string
-  icon: string
-  children?: MenuItem[]
-}
+import type { MenuItem } from '@/schema/adminAside.ts'
 
 const router = useRouter()
 const route = useRoute()

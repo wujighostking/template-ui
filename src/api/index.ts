@@ -1,11 +1,13 @@
+import type { AxiosInstance, AxiosResponse } from 'axios'
 import axios from 'axios'
 
 import { CODE } from '@/common/code.ts'
 import { whiteList } from '@/common/constants.ts'
+import type { Response } from '@/schema/response.ts'
 import { isEmpty } from '@/utils'
 import { getStorage } from '@/utils/storage'
 
-export function createInstance() {
+export function createInstance(): AxiosInstance {
   const instance = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
     timeout: 10000,
@@ -34,14 +36,14 @@ export function createInstance() {
   )
 
   instance.interceptors.response.use(
-    (response) => {
+    (response: AxiosResponse<Response>) => {
       const data = response.data
       if (data?.code === CODE.UNAUTHORIZED) {
         window.location.href = '/login'
-        return
+        return response
       }
 
-      return data
+      return response
     },
     (error) => {
       // You can handle errors here
@@ -52,5 +54,11 @@ export function createInstance() {
   return instance
 }
 
-const request = createInstance()
+const _request = createInstance()
+function request(...args: Parameters<typeof _request>): Promise<Response> {
+  return _request(...args).then(
+    (response) => response.data,
+    (error) => Promise.reject(error),
+  )
+}
 export { request as default, request }

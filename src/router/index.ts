@@ -106,9 +106,9 @@ router.beforeEach(async (to) => {
 
   // token 已失效时清空并跳转到登录页
   try {
-    const data: any = await checkToken(token!)
+    const data = await checkToken(token!)
     if (data.code != 0) {
-      ElMessage.error('登录已过期，请重新登录')
+      ElMessage.error(data.message ?? '登录已过期，请重新登录')
       removeStorage('token')
       return { path: '/login' }
     }
