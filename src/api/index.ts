@@ -73,7 +73,7 @@ function normalizeConfig(...args: Parameters<typeof _request>): string {
 function request(config: AxiosRequestConfig, isCache?: boolean): Promise<Response>
 function request(url: string, config?: AxiosRequestConfig, isCache?: boolean): Promise<Response>
 
-async function request(...args: [...RequestArgs, isCache?: boolean]): Promise<Response> {
+function request(...args: [...RequestArgs, isCache?: boolean]): Promise<Response> {
   const last = args.at(-1)
   const isCache = isBoolean(last) ? last : true
   const requestArgs = (isBoolean(last) ? args.slice(0, -1) : args) as Parameters<typeof _request>
