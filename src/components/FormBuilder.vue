@@ -9,7 +9,7 @@ export interface FormItemConfig {
   type?: string | Component
   col?: Record<string, unknown>
   props?: Record<string, unknown>
-  slots?: Record<string, () => VNode>
+  slots?: Record<string, () => VNode | VNode[]>
 }
 
 const props = defineProps<{
