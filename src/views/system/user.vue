@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { Plus } from '@element-plus/icons-vue'
+import { Delete, Edit, Plus, Refresh } from '@element-plus/icons-vue'
 import { ElInput, ElSelect } from 'element-plus'
-import { ref } from 'vue'
+import { reactive } from 'vue'
 
-import FormBuilder, { type FormItemConfig } from '@/components/FormBuilder.vue'
-import TableBuilder, { type ColumnConfig } from '@/components/TableBuilder.vue'
+import type { FormItemConfig } from '@/components/FormBuilder.vue'
+import CrudPage, { type CrudPageConfig } from '@/components/system/CrudPage.vue'
+import type { ColumnConfig } from '@/components/TableBuilder.vue'
 
-const searchForm = ref<Record<string, unknown>>({
+const searchForm = reactive<Record<string, unknown>>({
   username: '',
   nickname: '',
+  dept: '',
+  phone: '',
 })
 
 const formItems: FormItemConfig[] = [
@@ -74,8 +77,33 @@ const tableData: Record<string, unknown>[] = [
   },
 ]
 
+const config: CrudPageConfig = {
+  title: '用户管理',
+  subtitle: '管理系统用户账号',
+  formItems,
+  formModel: searchForm,
+  columns,
+  data: tableData,
+  toolbar: [
+    { text: '新增', type: 'primary', icon: Plus, onClick: handleAdd },
+    { text: '编辑', type: 'primary', plain: true, icon: Edit, onClick: handleEdit },
+    { text: '删除', type: 'danger', plain: true, icon: Delete, onClick: handleDelete },
+    { text: '导入', onClick: handleImport },
+    { text: '导出', onClick: handleExport },
+    { text: '刷新', icon: Refresh, onClick: handleRefresh },
+  ],
+}
+
 function handleAdd() {
   // 新增用户逻辑
+}
+
+function handleEdit() {
+  // 编辑用户逻辑
+}
+
+function handleDelete() {
+  // 删除用户逻辑
 }
 
 function handleImport() {
@@ -85,82 +113,12 @@ function handleImport() {
 function handleExport() {
   // 导出逻辑
 }
+
+function handleRefresh() {
+  // 刷新逻辑
+}
 </script>
 
 <template>
-  <div class="user">
-    <div class="user__header">
-      <h2 class="user__title">用户管理</h2>
-      <p class="user__subtitle">管理系统用户账号</p>
-    </div>
-
-    <el-card shadow="never" class="user__search">
-      <FormBuilder :form="searchForm" :form-items="formItems" :rowProps="{ gutter: 16 }" />
-    </el-card>
-
-    <el-card shadow="never" class="user__table">
-      <div class="user__toolbar">
-        <el-button type="primary" :icon="Plus" @click="handleAdd">新增</el-button>
-        <el-button @click="handleImport">导入</el-button>
-        <el-button @click="handleExport">导出</el-button>
-      </div>
-
-      <TableBuilder :columns="columns" :data="tableData" />
-    </el-card>
-  </div>
+  <CrudPage :config="config" />
 </template>
-
-<style scoped lang="scss">
-.user {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  width: 100%;
-
-  .user__header {
-    padding: 4px 4px 0;
-
-    .user__title {
-      margin: 0 0 8px;
-      font-size: 18px;
-      font-weight: 600;
-      color: #1e293b;
-    }
-
-    .user__subtitle {
-      margin: 0;
-      font-size: 13px;
-      color: #64748b;
-    }
-  }
-
-  .user__search {
-    border-radius: 8px;
-
-    :deep(.el-card__body) {
-      display: flex;
-      align-items: center;
-      min-height: 64px;
-    }
-
-    :deep(.el-form) {
-      width: 100%;
-    }
-
-    :deep(.el-form-item) {
-      margin-bottom: 0;
-    }
-  }
-
-  .user__table {
-    border-radius: 8px;
-  }
-
-  .user__toolbar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-}
-</style>
