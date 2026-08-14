@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Delete, Edit, Plus, Refresh } from '@element-plus/icons-vue'
-import { ElInput, ElSelect } from 'element-plus'
+import { ElDatePicker, ElInput, ElSelect } from 'element-plus'
 import { reactive } from 'vue'
 
 import type { FormItemConfig } from '@/components/FormBuilder.vue'
@@ -42,6 +42,13 @@ const formItems: FormItemConfig[] = [
     type: ElInput,
     props: { placeholder: '请输入手机号', clearable: true },
     col: { span: 6 },
+  },
+  {
+    model: 'createTime',
+    label: '创建时间',
+    type: ElDatePicker,
+    props: { placeholder: '请输入创建时间', clearable: true, type: 'datetimerange' },
+    col: { span: 6, style: { marginTop: '8px' } },
   },
 ]
 

@@ -54,6 +54,8 @@ defineProps<{
         :form="config.formModel"
         :form-items="config.formItems"
         :rowProps="{ gutter: 16 }"
+        label-position="right"
+        label-width="auto"
       />
     </el-card>
 
