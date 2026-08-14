@@ -89,6 +89,7 @@ defineExpose({ multipleSelection })
         :columns="config.columns"
         :data="config.data"
         :has-pagination="config.hasPagination"
+        row-key="id"
         @selection-change="handleSelectionChange"
       />
     </el-card>
