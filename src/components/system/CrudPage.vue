@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Component } from 'vue'
+import { type Component, shallowRef } from 'vue'
 
 import FormBuilder, { type FormItemConfig } from '@/components/FormBuilder.vue'
 import TableBuilder, { type ColumnConfig } from '@/components/TableBuilder.vue'
@@ -35,11 +35,21 @@ export interface CrudPageConfig {
   toolbar?: ToolbarButtonConfig[]
   /** 是否显示分页，默认显示 */
   hasPagination?: boolean
+  /** 表格选中项变化回调 */
+  onSelectionChange?: (selection: any[]) => void
 }
 
-defineProps<{
+const props = defineProps<{
   config: CrudPageConfig
 }>()
+
+const multipleSelection = shallowRef<any[]>([])
+const handleSelectionChange = (val: any[]) => {
+  multipleSelection.value = val
+  props.config.onSelectionChange?.(val)
+}
+
+defineExpose({ multipleSelection })
 </script>
 
 <template>
@@ -79,6 +89,7 @@ defineProps<{
         :columns="config.columns"
         :data="config.data"
         :has-pagination="config.hasPagination"
+        @selection-change="handleSelectionChange"
       />
     </el-card>
   </div>

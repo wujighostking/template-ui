@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Delete, Edit, Plus } from '@element-plus/icons-vue'
+import { Delete, Edit, Plus, Refresh, Search } from '@element-plus/icons-vue'
 import { ElDatePicker, ElInput, ElSelect } from 'element-plus'
-import { reactive } from 'vue'
+import { reactive, shallowRef } from 'vue'
 
 import type { FormItemConfig } from '@/components/FormBuilder.vue'
 import CrudPage, { type CrudPageConfig } from '@/components/system/CrudPage.vue'
@@ -46,6 +46,7 @@ const formItems: FormItemConfig[] = [
 ]
 
 const columns: ColumnConfig[] = [
+  { type: 'selection', width: 50 },
   { prop: 'roleName', label: '角色名称' },
   { prop: 'roleCode', label: '字符代码' },
   { prop: 'sort', label: '排序' },
@@ -77,6 +78,9 @@ const tableData: Record<string, unknown>[] = [
   },
 ]
 
+/** 表格选中的行 */
+const multipleSelection = shallowRef<any[]>([])
+
 const config: CrudPageConfig = {
   title: '角色管理',
   subtitle: '管理系统角色与权限',
@@ -84,13 +88,26 @@ const config: CrudPageConfig = {
   formModel: searchForm,
   columns,
   data: tableData,
+  onSelectionChange: (selection) => {
+    multipleSelection.value = selection
+  },
   toolbar: [
+    { text: '查询', type: 'primary', plain: true, icon: Search, onClick: handleSearch },
+    { text: '重置', type: 'default', plain: true, icon: Refresh, onClick: handleReset },
     { text: '新增', type: 'primary', icon: Plus, onClick: handleAdd },
     { text: '编辑', type: 'primary', plain: true, icon: Edit, onClick: handleEdit },
     { text: '删除', type: 'danger', plain: true, icon: Delete, onClick: handleDelete },
     { text: '分配用户', onClick: handleAssignUser },
     { text: '刷新', onClick: handleRefresh },
   ],
+}
+
+function handleSearch() {
+  // 查询逻辑
+}
+
+function handleReset() {
+  // 重置逻辑
 }
 
 function handleAdd() {

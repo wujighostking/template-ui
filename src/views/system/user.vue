@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Delete, Edit, Plus, Refresh } from '@element-plus/icons-vue'
+import { Delete, Edit, Plus, Refresh, Search } from '@element-plus/icons-vue'
 import { ElDatePicker, ElInput, ElSelect } from 'element-plus'
 import { reactive } from 'vue'
 
@@ -53,6 +53,7 @@ const formItems: FormItemConfig[] = [
 ]
 
 const columns: ColumnConfig[] = [
+  { type: 'selection', width: 50 },
   { prop: 'username', label: '用户名' },
   { prop: 'nickname', label: '昵称' },
   { prop: 'dept', label: '部门' },
@@ -92,6 +93,8 @@ const config: CrudPageConfig = {
   columns,
   data: tableData,
   toolbar: [
+    { text: '查询', type: 'primary', plain: true, icon: Search, onClick: handleSearch },
+    { text: '重置', type: 'default', plain: true, icon: Refresh, onClick: handleReset },
     { text: '新增', type: 'primary', icon: Plus, onClick: handleAdd },
     { text: '编辑', type: 'primary', plain: true, icon: Edit, onClick: handleEdit },
     { text: '删除', type: 'danger', plain: true, icon: Delete, onClick: handleDelete },
@@ -101,10 +104,17 @@ const config: CrudPageConfig = {
   ],
 }
 
+function handleSearch() {
+  // 查询逻辑
+}
+
+function handleReset() {
+  //  重置逻辑
+}
+
 function handleAdd() {
   // 新增用户逻辑
 }
-
 function handleEdit() {
   // 编辑用户逻辑
 }
