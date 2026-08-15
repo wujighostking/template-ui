@@ -35,56 +35,6 @@ const router = createRouter({
           path: '/system/menu',
           component: () => import('@/views/system/menu.vue'),
         },
-        {
-          name: 'role',
-          path: '/system/role',
-          component: () => import('@/views/system/role.vue'),
-        },
-        {
-          name: 'dept',
-          path: '/system/dept',
-          component: () => import('@/views/system/dept.vue'),
-        },
-        {
-          name: 'post',
-          path: '/system/post',
-          component: () => import('@/views/system/post.vue'),
-        },
-        {
-          name: 'dict',
-          path: '/system/dict',
-          component: () => import('@/views/system/dict.vue'),
-        },
-        {
-          name: 'online',
-          path: '/monitor/online',
-          component: () => import('@/views/monitor/online.vue'),
-        },
-        {
-          name: 'job',
-          path: '/monitor/job',
-          component: () => import('@/views/monitor/job.vue'),
-        },
-        {
-          name: 'data',
-          path: '/monitor/data',
-          component: () => import('@/views/monitor/data.vue'),
-        },
-        {
-          name: 'build',
-          path: '/tool/build',
-          component: () => import('@/views/tool/build.vue'),
-        },
-        {
-          name: 'gen',
-          path: '/tool/gen',
-          component: () => import('@/views/tool/gen.vue'),
-        },
-        {
-          name: 'swagger',
-          path: '/tool/swagger',
-          component: () => import('@/views/tool/swagger.vue'),
-        },
       ],
     },
   ],

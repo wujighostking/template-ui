@@ -17,56 +17,59 @@ import {
   Tools,
   User,
 } from '@element-plus/icons-vue'
-import { type Component, computed } from 'vue'
+import { type Component, computed, onBeforeMount, shallowRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { getMenu } from '@/api/menu.ts'
+import { CODE } from '@/common/code.ts'
 import type { MenuItem } from '@/schema/adminAside.ts'
+import { buildMenuTree } from '@/utils/menu.ts'
 
 const router = useRouter()
 const route = useRoute()
 
 const activeMenu = computed(() => route.path)
 
-const menus: MenuItem[] = [
+const menus = shallowRef<MenuItem[]>([
   {
-    index: '/workspace',
-    title: '工作台',
+    componentPath: '/workspace',
+    menuName: '工作台',
     icon: 'Odometer',
   },
   {
-    index: '/system',
-    title: '系统管理',
+    componentPath: '/system',
+    menuName: '系统管理',
     icon: 'Setting',
     children: [
-      { index: '/system/user', title: '用户管理', icon: 'User' },
-      { index: '/system/role', title: '角色管理', icon: 'Key' },
-      { index: '/system/menu', title: '菜单管理', icon: 'MenuIcon' },
-      { index: '/system/dept', title: '部门管理', icon: 'OfficeBuilding' },
-      { index: '/system/post', title: '岗位管理', icon: 'Postcard' },
-      { index: '/system/dict', title: '字典管理', icon: 'Notebook' },
+      { componentPath: '/system/user', menuName: '用户管理', icon: 'User' },
+      { componentPath: '/system/role', menuName: '角色管理', icon: 'Key' },
+      { componentPath: '/system/menu', menuName: '菜单管理', icon: 'MenuIcon' },
+      { componentPath: '/system/dept', menuName: '部门管理', icon: 'OfficeBuilding' },
+      { componentPath: '/system/post', menuName: '岗位管理', icon: 'Postcard' },
+      { componentPath: '/system/dict', menuName: '字典管理', icon: 'Notebook' },
     ],
   },
   {
-    index: '/monitor',
-    title: '系统监控',
+    componentPath: '/monitor',
+    menuName: '系统监控',
     icon: 'Monitor',
     children: [
-      { index: '/monitor/online', title: '在线用户', icon: 'BellFilled' },
-      { index: '/monitor/job', title: '定时任务', icon: 'Timer' },
-      { index: '/monitor/data', title: '数据监控', icon: 'DataLine' },
+      { componentPath: '/monitor/online', menuName: '在线用户', icon: 'BellFilled' },
+      { componentPath: '/monitor/job', menuName: '定时任务', icon: 'Timer' },
+      { componentPath: '/monitor/data', menuName: '数据监控', icon: 'DataLine' },
     ],
   },
   {
-    index: '/tool',
-    title: '系统工具',
+    componentPath: '/tool',
+    menuName: '系统工具',
     icon: 'Tools',
     children: [
-      { index: '/tool/build', title: '表单构建', icon: 'DocumentCopy' },
-      { index: '/tool/gen', title: '代码生成', icon: 'EditPen' },
-      { index: '/tool/swagger', title: '系统接口', icon: 'Connection' },
+      { componentPath: '/tool/build', menuName: '表单构建', icon: 'DocumentCopy' },
+      { componentPath: '/tool/gen', menuName: '代码生成', icon: 'EditPen' },
+      { componentPath: '/tool/swagger', menuName: '系统接口', icon: 'Connection' },
     ],
   },
-]
+])
 
 const icons: Record<string, Component> = {
   Setting,
@@ -90,6 +93,14 @@ const icons: Record<string, Component> = {
 function handleMenuSelect(index: string) {
   router.push(index)
 }
+
+onBeforeMount(() => {
+  getMenu().then((res) => {
+    if (res.code === CODE.SUCCESS) {
+      menus.value = buildMenuTree(res.data ?? [])
+    }
+  })
+})
 </script>
 
 <template>
@@ -102,26 +113,30 @@ function handleMenuSelect(index: string) {
       active-text-color="#3b82f6"
       @select="handleMenuSelect"
     >
-      <template v-for="item in menus" :key="item.index">
-        <el-sub-menu v-if="item.children?.length" :index="item.index">
+      <template v-for="item in menus" :key="item.componentPath">
+        <el-sub-menu v-if="item.children?.length" :index="item.componentPath">
           <template #title>
             <el-icon>
               <component :is="icons[item.icon]" />
             </el-icon>
-            <span>{{ item.title }}</span>
+            <span>{{ item.menuName }}</span>
           </template>
-          <el-menu-item v-for="child in item.children" :key="child.index" :index="child.index">
+          <el-menu-item
+            v-for="child in item.children"
+            :key="child.componentPath"
+            :index="child.componentPath"
+          >
             <el-icon>
               <component :is="icons[child.icon]" />
             </el-icon>
-            <span>{{ child.title }}</span>
+            <span>{{ child.menuName }}</span>
           </el-menu-item>
         </el-sub-menu>
-        <el-menu-item v-else :index="item.index">
+        <el-menu-item v-else :index="item.componentPath">
           <el-icon>
             <component :is="icons[item.icon]" />
           </el-icon>
-          <span>{{ item.title }}</span>
+          <span>{{ item.menuName }}</span>
         </el-menu-item>
       </template>
     </el-menu>

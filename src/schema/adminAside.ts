@@ -1,6 +1,6 @@
 export interface MenuItem {
-  index: string
-  title: string
+  componentPath: string
+  menuName: string
   icon: string
   children?: MenuItem[]
 }

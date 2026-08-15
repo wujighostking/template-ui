@@ -5,6 +5,8 @@ import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { login } from '@/api/login'
+import { CODE } from '@/common/code.ts'
+import { addRoutes } from '@/router/routesHandler.ts'
 import type { LoginForm } from '@/schema/loginForm'
 import { setStorage } from '@/utils/storage'
 
@@ -40,23 +42,30 @@ function handleLogin() {
     loading.value = true
 
     login({ ...form })
-      .then((data) => {
-        if (data.code !== 0) {
-          ElMessage.error(data.message || '登录失败，请检查手机号码或密码')
-          return
+      .then(
+        (data) => {
+          if (data.code !== 0) {
+            ElMessage.error(data.message || '登录失败，请检查手机号码或密码')
+            return
+          }
+
+          setStorage('token', data.data)
+          ElMessage.success(data.message || '登录成功')
+
+          return addRoutes()
+        },
+        (error) => {
+          if (__DEV__) {
+            console.error('登录失败', error)
+          }
+
+          ElMessage.error('登录失败，请检查手机号码或密码')
+        },
+      )
+      .then((res) => {
+        if (res?.code === CODE.SUCCESS) {
+          router.push('/')
         }
-
-        setStorage('token', data.data)
-        ElMessage.success(data.message || '登录成功')
-
-        router.push('/')
-      })
-      .catch((error) => {
-        if (__DEV__) {
-          console.error('登录失败', error)
-        }
-
-        ElMessage.error('登录失败，请检查手机号码或密码')
       })
       .finally(() => {
         loading.value = false
