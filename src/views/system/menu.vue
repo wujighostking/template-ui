@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { Delete, Edit, Plus, Refresh, Search, Sort } from '@element-plus/icons-vue'
-import { ElDatePicker, ElInput, ElSelect } from 'element-plus'
-import { reactive, shallowRef } from 'vue'
+import { ElDatePicker, ElInput } from 'element-plus'
+import { onBeforeMount, reactive, shallowRef, useTemplateRef } from 'vue'
 
+import { getMenu } from '@/api/menu.ts'
 import type { FormItemConfig } from '@/components/FormBuilder.vue'
 import CrudPage, { type CrudPageConfig } from '@/components/system/CrudPage.vue'
+import CreateDialog from '@/components/system/menu/CreateDialog.vue'
 import type { ColumnConfig } from '@/components/TableBuilder.vue'
 
 const searchForm = reactive<Record<string, unknown>>({
@@ -42,20 +44,22 @@ const columns: ColumnConfig[] = [
   { prop: 'menuName', label: '菜单名称' },
   { prop: 'icon', label: '图标' },
   { prop: 'sort', label: '排序' },
-  { prop: 'perms', label: '权限标识' },
-  { prop: 'component', label: '组件路径' },
+  { prop: 'permission', label: '权限标识' },
+  { prop: 'componentPath', label: '组件路径' },
+  { prop: 'componentName', label: '组件名称' },
   { prop: 'status', label: '状态' },
   { prop: 'createTime', label: '创建时间' },
 ]
 
-const tableData: Record<string, unknown>[] = [
+const tableData = shallowRef<Record<string, unknown>[]>([
   {
     id: crypto.randomUUID(),
     menuName: '系统管理',
     icon: 'Setting',
     sort: 1,
-    perms: 'system',
-    component: 'system/index',
+    permission: 'system',
+    componentPath: 'system/index',
+    componentName: 'system/index',
     status: '正常',
     createTime: '2024-01-01 09:00',
     children: [
@@ -64,8 +68,9 @@ const tableData: Record<string, unknown>[] = [
         menuName: '用户管理',
         icon: 'User',
         sort: 1,
-        perms: 'system:user:list',
-        component: 'system/user/index',
+        permission: 'system:user:list',
+        componentPath: 'system/user/index',
+        componentName: 'system/user/index',
         status: '正常',
         createTime: '2024-05-11 10:32',
       },
@@ -74,8 +79,9 @@ const tableData: Record<string, unknown>[] = [
         menuName: '角色管理',
         icon: 'UserFilled',
         sort: 2,
-        perms: 'system:role:list',
-        component: 'system/role/index',
+        permission: 'system:role:list',
+        componentPath: 'system/role/index',
+        componentName: 'system/role/index',
         status: '正常',
         createTime: '2024-05-11 10:32',
       },
@@ -84,8 +90,9 @@ const tableData: Record<string, unknown>[] = [
         menuName: '菜单管理',
         icon: 'Menu',
         sort: 3,
-        perms: 'system:menu:list',
-        component: 'system/menu/index',
+        permission: 'system:menu:list',
+        componentPath: 'system/menu/index',
+        componentName: 'system/menu/index',
         status: '正常',
         createTime: '2024-05-11 10:32',
       },
@@ -94,8 +101,9 @@ const tableData: Record<string, unknown>[] = [
         menuName: '部门管理',
         icon: 'OfficeBuilding',
         sort: 4,
-        perms: 'system:dept:list',
-        component: 'system/dept/index',
+        permission: 'system:dept:list',
+        componentPath: 'system/dept/index',
+        componentName: 'system/dept/index',
         status: '正常',
         createTime: '2024-05-11 10:32',
       },
@@ -104,8 +112,9 @@ const tableData: Record<string, unknown>[] = [
         menuName: '岗位管理',
         icon: 'Suitcase',
         sort: 5,
-        perms: 'system:post:list',
-        component: 'system/post/index',
+        permission: 'system:post:list',
+        componentPath: 'system/post/index',
+        componentName: 'system/post/index',
         status: '正常',
         createTime: '2024-05-11 10:32',
       },
@@ -114,101 +123,21 @@ const tableData: Record<string, unknown>[] = [
         menuName: '字典管理',
         icon: 'Collection',
         sort: 6,
-        perms: 'system:dict:list',
-        component: 'system/dict/index',
+        permission: 'system:dict:list',
+        componentPath: 'system/dict/index',
+        componentName: 'system/dict/index',
         status: '正常',
         createTime: '2024-05-11 10:32',
       },
     ],
   },
-  {
-    id: crypto.randomUUID(),
-    menuName: '系统监控',
-    icon: 'Monitor',
-    sort: 2,
-    perms: 'monitor',
-    component: 'monitor/index',
-    status: '正常',
-    createTime: '2024-01-01 09:00',
-    children: [
-      {
-        id: crypto.randomUUID(),
-        menuName: '在线用户',
-        icon: 'Bell',
-        sort: 1,
-        perms: 'monitor:online:list',
-        component: 'monitor/online/index',
-        status: '正常',
-        createTime: '2024-05-11 10:33',
-      },
-      {
-        id: crypto.randomUUID(),
-        menuName: '定时任务',
-        icon: 'Timer',
-        sort: 2,
-        perms: 'monitor:job:list',
-        component: 'monitor/job/index',
-        status: '正常',
-        createTime: '2024-05-11 10:33',
-      },
-      {
-        id: crypto.randomUUID(),
-        menuName: '数据监控',
-        icon: 'DataBoard',
-        sort: 3,
-        perms: 'monitor:druid:list',
-        component: 'monitor/druid/index',
-        status: '正常',
-        createTime: '2024-05-11 10:33',
-      },
-    ],
-  },
-  {
-    id: crypto.randomUUID(),
-    menuName: '系统工具',
-    icon: 'Tools',
-    sort: 3,
-    perms: 'tool',
-    component: 'tool/index',
-    status: '正常',
-    createTime: '2024-01-01 09:00',
-    children: [
-      {
-        id: crypto.randomUUID(),
-        menuName: '表单构建',
-        icon: 'Document',
-        sort: 1,
-        perms: 'tool:build:list',
-        component: 'tool/build/index',
-        status: '正常',
-        createTime: '2024-05-11 10:34',
-      },
-      {
-        id: crypto.randomUUID(),
-        menuName: '代码生成',
-        icon: 'EditPen',
-        sort: 2,
-        perms: 'tool:gen:list',
-        component: 'tool/gen/index',
-        status: '正常',
-        createTime: '2024-05-11 10:34',
-      },
-      {
-        id: crypto.randomUUID(),
-        menuName: '系统接口',
-        icon: 'ChatDotRound',
-        sort: 3,
-        perms: 'tool:swagger:list',
-        component: 'tool/swagger/index',
-        status: '正常',
-        createTime: '2024-05-11 10:34',
-      },
-    ],
-  },
-]
+])
 
 /** 表格选中的行 */
 const multipleSelection = shallowRef<any[]>([])
+
+/** 新增菜单弹窗引用 */
+const menuDialogRef = useTemplateRef<InstanceType<typeof CreateDialog>>('menuDialogRef')
 
 const config: CrudPageConfig = {
   title: '菜单管理',
@@ -239,7 +168,7 @@ function handleReset() {
 }
 
 function handleAdd() {
-  // 新增菜单逻辑
+  menuDialogRef.value?.open('add')
 }
 function handleEdit() {
   // 编辑菜单逻辑
@@ -252,10 +181,19 @@ function handleDelete() {
 function handleAdjustSort() {
   // 调整排序逻辑
 }
+
+onBeforeMount(() => {
+  getMenu().then((res) => {
+    console.log(res)
+
+    tableData.value = res.data
+  })
+})
 </script>
 
 <template>
   <CrudPage :config="config" />
+  <CreateDialog ref="menuDialogRef" />
 </template>
 
 <style scoped lang="scss"></style>

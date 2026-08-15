@@ -1,0 +1,14 @@
+import request from '@/api/index.ts'
+import type { MenuDTO } from '@/schema/menu.ts'
+
+export function createMenu(data: MenuDTO) {
+  return request({ url: '/menu/create', method: 'POST', data })
+}
+
+export function getMenu() {
+  return request({ url: '/menu/list', method: 'GET' })
+}
+
+export function getTopMenu() {
+  return request({ url: '/menu/top', method: 'GET' })
+}

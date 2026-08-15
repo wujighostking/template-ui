@@ -114,8 +114,8 @@ router.beforeEach(async (to) => {
     }
   } catch {
     // 校验接口异常时阻断导航，并提示
-    ElMessage.error('接口异常，请重试')
-    return false
+    ElMessage.error('身份验证失败，请重新登录')
+    return { path: '/login' }
   }
 
   return true

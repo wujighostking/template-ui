@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type Component, shallowRef } from 'vue'
+import { type Component, type MaybeRefOrGetter, computed, shallowRef, toValue } from 'vue'
 
 import FormBuilder, { type FormItemConfig } from '@/components/FormBuilder.vue'
 import TableBuilder, { type ColumnConfig } from '@/components/TableBuilder.vue'
@@ -29,8 +29,8 @@ export interface CrudPageConfig {
   formModel?: Record<string, unknown>
   /** 表格列配置 */
   columns?: ColumnConfig[]
-  /** 表格数据 */
-  data?: Record<string, unknown>[]
+  /** 表格数据（支持直接传数组、ref 或 getter，保持响应式） */
+  data?: MaybeRefOrGetter<Record<string, unknown>[]>
   /** 工具栏按钮配置 */
   toolbar?: ToolbarButtonConfig[]
   /** 是否显示分页，默认显示 */
@@ -42,6 +42,9 @@ export interface CrudPageConfig {
 const props = defineProps<{
   config: CrudPageConfig
 }>()
+
+/** 表格数据（解包响应式 data，数据更新时自动刷新表格） */
+const tableData = computed(() => toValue(props.config.data) ?? [])
 
 const multipleSelection = shallowRef<any[]>([])
 const handleSelectionChange = (val: any[]) => {
@@ -87,7 +90,7 @@ defineExpose({ multipleSelection })
 
       <TableBuilder
         :columns="config.columns"
-        :data="config.data"
+        :data="tableData"
         :has-pagination="config.hasPagination"
         row-key="id"
         @selection-change="handleSelectionChange"
