@@ -8,7 +8,7 @@ import {
   ElRadioGroup,
   ElSelect,
 } from 'element-plus'
-import { computed, h, onBeforeMount, reactive, ref, shallowRef } from 'vue'
+import { computed, h, watch, reactive, ref, shallowRef } from 'vue'
 
 import { createMenu, getTopMenu, updateMenu } from '@/api/menu.ts'
 import { CODE } from '@/common/code.ts'
@@ -194,7 +194,9 @@ async function handleSubmit() {
   }
 }
 
-onBeforeMount(() => {
+watch(dialogVisible, () => {
+  if (!dialogVisible.value) return
+
   getTopMenu().then((res) => {
     parentMenuOptions.value = res.data.map((item: { id: string; menuName: string }) => ({
       value: item.id,
