@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { VNode } from 'vue'
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 
 export interface ColumnConfig {
   prop?: string
@@ -25,11 +25,17 @@ const props = withDefaults(
     data?: Record<string, unknown>[]
     /** 是否显示分页 */
     hasPagination?: boolean
+    /** 树形表格配置（如 { children: 'children', hasChildren: 'hasChildren' }） */
+    treeProps?: Record<string, string>
+    /** 是否默认展开所有行（仅在配置了 treeProps 时生效） */
+    defaultExpandAll?: boolean
   }>(),
   {
     columns: () => [],
     data: () => [],
     hasPagination: true,
+    treeProps: () => ({}),
+    defaultExpandAll: true,
   },
 )
 
@@ -65,12 +71,21 @@ function handleCurrentChange(current: number) {
   pageQuery.current = current
   emits('currentChange', pageQuery)
 }
+
+/** 是否启用树形表格：treeProps 中指定了 children 字段即可 */
+const hasTree = computed(() => Boolean(props.treeProps && props.treeProps.children))
 </script>
 
 <template>
   <div>
     <div>
-      <el-table :data="props.data" style="width: 100%" v-bind="$attrs">
+      <el-table
+        :data="props.data"
+        style="width: 100%"
+        :tree-props="hasTree ? props.treeProps : undefined"
+        :default-expand-all="hasTree ? props.defaultExpandAll : undefined"
+        v-bind="$attrs"
+      >
         <el-table-column
           v-for="column in props.columns"
           :key="column.prop"

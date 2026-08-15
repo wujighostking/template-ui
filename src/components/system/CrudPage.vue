@@ -35,6 +35,10 @@ export interface CrudPageConfig {
   toolbar?: ToolbarButtonConfig[]
   /** 是否显示分页，默认显示 */
   hasPagination?: boolean
+  /** 树形表格配置（如 { children: 'children' }），传了即启用树形表格 */
+  treeProps?: Record<string, string>
+  /** 是否默认展开所有行（仅在启用树形表格时生效） */
+  defaultExpandAll?: boolean
   /** 表格选中项变化回调 */
   onSelectionChange?: (selection: any[]) => void
 }
@@ -92,6 +96,8 @@ defineExpose({ multipleSelection })
         :columns="config.columns"
         :data="tableData"
         :has-pagination="config.hasPagination"
+        :tree-props="config.treeProps"
+        :default-expand-all="config.defaultExpandAll"
         row-key="id"
         @selection-change="handleSelectionChange"
       />

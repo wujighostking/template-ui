@@ -8,6 +8,8 @@ import type { FormItemConfig } from '@/components/FormBuilder.vue'
 import CrudPage, { type CrudPageConfig } from '@/components/system/CrudPage.vue'
 import CreateDialog from '@/components/system/menu/CreateDialog.vue'
 import type { ColumnConfig } from '@/components/TableBuilder.vue'
+import type { MenuNode } from '@/schema/menu.ts'
+import { buildTree } from '@/utils'
 
 const searchForm = reactive<Record<string, unknown>>({
   menuName: '',
@@ -41,97 +43,17 @@ const formItems: FormItemConfig[] = [
 
 const columns: ColumnConfig[] = [
   { type: 'selection', width: 50 },
-  { prop: 'menuName', label: '菜单名称' },
+  { prop: 'menuName', label: '菜单名称', minWidth: 180 },
   { prop: 'icon', label: '图标' },
-  { prop: 'sort', label: '排序' },
-  { prop: 'permission', label: '权限标识' },
+  { prop: 'sort', label: '排序', width: 80 },
+  { prop: 'permission', label: '权限标识', minWidth: 180 },
   { prop: 'componentPath', label: '组件路径' },
   { prop: 'componentName', label: '组件名称' },
-  { prop: 'status', label: '状态' },
-  { prop: 'createTime', label: '创建时间' },
+  { prop: 'status', label: '状态', width: 80 },
+  { prop: 'createTime', label: '创建时间', width: 180 },
 ]
 
-const tableData = shallowRef<Record<string, unknown>[]>([
-  {
-    id: crypto.randomUUID(),
-    menuName: '系统管理',
-    icon: 'Setting',
-    sort: 1,
-    permission: 'system',
-    componentPath: 'system/index',
-    componentName: 'system/index',
-    status: '正常',
-    createTime: '2024-01-01 09:00',
-    children: [
-      {
-        id: crypto.randomUUID(),
-        menuName: '用户管理',
-        icon: 'User',
-        sort: 1,
-        permission: 'system:user:list',
-        componentPath: 'system/user/index',
-        componentName: 'system/user/index',
-        status: '正常',
-        createTime: '2024-05-11 10:32',
-      },
-      {
-        id: crypto.randomUUID(),
-        menuName: '角色管理',
-        icon: 'UserFilled',
-        sort: 2,
-        permission: 'system:role:list',
-        componentPath: 'system/role/index',
-        componentName: 'system/role/index',
-        status: '正常',
-        createTime: '2024-05-11 10:32',
-      },
-      {
-        id: crypto.randomUUID(),
-        menuName: '菜单管理',
-        icon: 'Menu',
-        sort: 3,
-        permission: 'system:menu:list',
-        componentPath: 'system/menu/index',
-        componentName: 'system/menu/index',
-        status: '正常',
-        createTime: '2024-05-11 10:32',
-      },
-      {
-        id: crypto.randomUUID(),
-        menuName: '部门管理',
-        icon: 'OfficeBuilding',
-        sort: 4,
-        permission: 'system:dept:list',
-        componentPath: 'system/dept/index',
-        componentName: 'system/dept/index',
-        status: '正常',
-        createTime: '2024-05-11 10:32',
-      },
-      {
-        id: crypto.randomUUID(),
-        menuName: '岗位管理',
-        icon: 'Suitcase',
-        sort: 5,
-        permission: 'system:post:list',
-        componentPath: 'system/post/index',
-        componentName: 'system/post/index',
-        status: '正常',
-        createTime: '2024-05-11 10:32',
-      },
-      {
-        id: crypto.randomUUID(),
-        menuName: '字典管理',
-        icon: 'Collection',
-        sort: 6,
-        permission: 'system:dict:list',
-        componentPath: 'system/dict/index',
-        componentName: 'system/dict/index',
-        status: '正常',
-        createTime: '2024-05-11 10:32',
-      },
-    ],
-  },
-])
+const tableData = shallowRef<MenuNode[]>([])
 
 /** 表格选中的行 */
 const multipleSelection = shallowRef<any[]>([])
@@ -146,6 +68,8 @@ const config: CrudPageConfig = {
   formModel: searchForm,
   columns,
   data: tableData,
+  treeProps: { children: 'children' },
+  defaultExpandAll: true,
   onSelectionChange: (selection) => {
     multipleSelection.value = selection
   },
@@ -184,9 +108,13 @@ function handleAdjustSort() {
 
 onBeforeMount(() => {
   getMenu().then((res) => {
-    console.log(res)
-
-    tableData.value = res.data
+    /**
+     * 后端返回的是扁平数据，每个节点带有 parentId 字段：
+     * - parentId 为 null 时为顶级菜单
+     * - parentId 不为 null 时为对应 id 节点的子菜单
+     * 通过 buildTree 转换为 el-table 所需的 children 树形结构
+     */
+    tableData.value = buildTree<MenuNode>(res.data ?? [])
   })
 })
 </script>

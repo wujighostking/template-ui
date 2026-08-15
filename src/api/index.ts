@@ -10,6 +10,7 @@ import { isEmpty } from '@/utils'
 import { getStorage } from '@/utils/storage'
 import { isBoolean, isString } from '@/utils/types.ts'
 import Boolean = types.Boolean
+import { ElMessage } from 'element-plus'
 
 export function createInstance(): AxiosInstance {
   const instance = axios.create({
@@ -42,7 +43,8 @@ export function createInstance(): AxiosInstance {
       const data = response.data
       if (data?.code === CODE.UNAUTHORIZED) {
         window.location.href = '/login'
-        return response
+      } else if (data?.code !== CODE.SUCCESS && data?.message) {
+        ElMessage.error(data.message)
       }
 
       return response

@@ -104,7 +104,6 @@ const config: CrudPageConfig = {
   formModel: searchForm,
   columns,
   data: tableData,
-  rowKey: 'id',
   onSelectionChange: (selection) => {
     multipleSelection.value = selection
   },
