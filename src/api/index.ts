@@ -1,6 +1,6 @@
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import axios from 'axios'
-import { types } from 'sass'
+import { ElMessage } from 'element-plus'
 
 import { CODE } from '@/common/code.ts'
 import { whiteList } from '@/common/constants.ts'
@@ -9,8 +9,6 @@ import type { Response } from '@/schema/response.ts'
 import { isEmpty } from '@/utils'
 import { getStorage } from '@/utils/storage'
 import { isBoolean, isString } from '@/utils/types.ts'
-import Boolean = types.Boolean
-import { ElMessage } from 'element-plus'
 
 export function createInstance(): AxiosInstance {
   const instance = axios.create({
