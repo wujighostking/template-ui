@@ -12,3 +12,6 @@ export function getMenu() {
 export function getTopMenu() {
   return request({ url: '/menu/top', method: 'GET' })
 }
+export function updateMenu(data: MenuDTO) {
+  return request({ url: '/menu/update', method: 'PUT', data })
+}

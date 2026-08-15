@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Delete, Edit, Plus, Refresh, Search, Sort } from '@element-plus/icons-vue'
-import { ElDatePicker, ElInput } from 'element-plus'
+import { ElDatePicker, ElInput, ElMessage } from 'element-plus'
 import { onBeforeMount, reactive, shallowRef, useTemplateRef } from 'vue'
 
 import { getMenu } from '@/api/menu.ts'
@@ -42,7 +42,7 @@ const formItems: FormItemConfig[] = [
 ]
 
 const columns: ColumnConfig[] = [
-  { type: 'selection', width: 50 },
+  { type: 'selection', width: 50, selectable: () => true },
   { prop: 'menuName', label: '菜单名称', minWidth: 180 },
   { prop: 'icon', label: '图标' },
   { prop: 'sort', label: '排序', width: 80 },
@@ -85,6 +85,15 @@ const config: CrudPageConfig = {
 
 function handleSearch() {
   // 查询逻辑
+  getMenu().then((res) => {
+    /**
+     * 后端返回的是扁平数据，每个节点带有 parentId 字段：
+     * - parentId 为 null 时为顶级菜单
+     * - parentId 不为 null 时为对应 id 节点的子菜单
+     * 通过 buildTree 转换为 el-table 所需的 children 树形结构
+     */
+    tableData.value = buildTree<MenuNode>(res.data ?? [])
+  })
 }
 
 function handleReset() {
@@ -96,6 +105,14 @@ function handleAdd() {
 }
 function handleEdit() {
   // 编辑菜单逻辑
+  if (multipleSelection.value.length === 0) {
+    ElMessage.warning('请先选择一条数据进行编辑')
+    return
+  } else if (multipleSelection.value.length > 1) {
+    ElMessage.warning('选择多条数据编辑，默认编辑第一条数据')
+  }
+
+  menuDialogRef.value?.open('edit', multipleSelection.value[0])
 }
 
 function handleDelete() {
@@ -107,21 +124,13 @@ function handleAdjustSort() {
 }
 
 onBeforeMount(() => {
-  getMenu().then((res) => {
-    /**
-     * 后端返回的是扁平数据，每个节点带有 parentId 字段：
-     * - parentId 为 null 时为顶级菜单
-     * - parentId 不为 null 时为对应 id 节点的子菜单
-     * 通过 buildTree 转换为 el-table 所需的 children 树形结构
-     */
-    tableData.value = buildTree<MenuNode>(res.data ?? [])
-  })
+  handleSearch()
 })
 </script>
 
 <template>
   <CrudPage :config="config" />
-  <CreateDialog ref="menuDialogRef" />
+  <CreateDialog ref="menuDialogRef" @handle-search="handleSearch" />
 </template>
 
 <style scoped lang="scss"></style>

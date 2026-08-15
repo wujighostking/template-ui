@@ -10,15 +10,19 @@ import {
 } from 'element-plus'
 import { computed, h, onBeforeMount, reactive, ref, shallowRef } from 'vue'
 
-import { createMenu, getTopMenu } from '@/api/menu.ts'
+import { createMenu, getTopMenu, updateMenu } from '@/api/menu.ts'
+import { CODE } from '@/common/code.ts'
 import FormBuilder, { type FormItemConfig } from '@/components/FormBuilder.vue'
 import type { MenuDTO } from '@/schema/menu.ts'
 
+const emit = defineEmits<{
+  (e: 'handleSearch'): void
+}>()
+
 /** 父菜单下拉选项（实际项目可从接口拉取，这里以静态数据演示） */
 const parentMenuOptions = shallowRef([
-  { value: 1, label: '系统管理' },
-  { value: 2, label: '系统监控' },
-  { value: 3, label: '系统工具' },
+  // { value: 1, label: '系统管理' },
+
 ])
 
 /** 状态下拉/单选选项：1-启用 0-禁用 */
@@ -121,7 +125,7 @@ const formItems: FormItemConfig[] = [
     col: { span: 12 },
     slots: {
       default: () =>
-        parentMenuOptions.value.map((item) =>
+        parentMenuOptions.value.map((item: { value: string; label: string }) =>
           h(ElOption, { key: item.value, value: item.value, label: item.label }),
         ),
     },
@@ -170,10 +174,21 @@ async function handleSubmit() {
   if (!formBuilderRef.value) return
   try {
     await formBuilderRef.value.validate()
-    await createMenu({ ...formData })
-    ElMessage.success('菜单保存成功')
+    let code, message
 
-    close()
+    if (dialogMode.value === 'add') {
+      ;({ code, message } = await createMenu({ ...formData }))
+    } else if (dialogMode.value === 'edit') {
+      // 编辑菜单逻辑
+
+      ;({ code, message } = await updateMenu({ ...formData }))
+    }
+
+    if (code === CODE.SUCCESS) {
+      emit('handleSearch')
+      ElMessage.success(message ?? '菜单新增成功')
+      close()
+    }
   } catch {
     // 校验失败，Element Plus 会自动展示错误信息
   }
