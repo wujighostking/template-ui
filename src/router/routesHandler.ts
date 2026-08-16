@@ -13,8 +13,12 @@ export function addRoutes() {
   return getMenu().then((res) => {
     if (res.code !== CODE.SUCCESS) return
 
-    const topMenus = handleTopMenu(res.data.filter((item: MenuNode) => item.parentId === null))
-    topMenus.forEach((route) => router.addRoute(route))
+    const topRoutes = handleTopMenu(res.data.filter((item: MenuNode) => item.parentId === null))
+    const routes = handleSubMenu(
+      topRoutes,
+      res.data.filter((item: MenuNode) => item.parentId !== null),
+    )
+    routes.forEach((route) => router.addRoute(route))
 
     return res
   })
@@ -58,4 +62,30 @@ function handleTopMenu(topMenus: MenuNode[]): RouteRecordRaw[] {
   })
 
   return menus
+}
+
+function handleSubMenu(topRoutes: RouteRecordRaw[], subMenus: MenuNode[]): RouteRecordRaw[] {
+  subMenus.forEach((menu, index) => {
+    const route = topRoutes.find((routes) => routes.meta?.id === menu.parentId)
+
+    if (!route) return
+
+    if (!route.children) {
+      route.children = []
+    }
+
+    const component = routes[`/src/${menu.componentPath}.vue`]
+
+    if (component) {
+      route.children.push({
+        name: menu.componentName ?? menu.menuName,
+        path: menu.componentUrl?.trim() || menu.componentPath.replace('views', ''),
+        component: component,
+      })
+    }
+
+    handleSubMenu(route.children, subMenus.slice(index + 1))
+  })
+
+  return topRoutes
 }
