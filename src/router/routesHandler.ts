@@ -5,7 +5,7 @@ import { CODE } from '@/common/code.ts'
 import type { MenuNode } from '@/schema/menu.ts'
 import { isObject } from '@/utils/types.ts'
 
-import router from './'
+import router, { routes as staticRoutes } from './'
 
 const routes = import.meta.glob('@/views/**/*.vue')
 
@@ -19,15 +19,9 @@ export function addRoutes() {
       res.data.filter((item: MenuNode) => item.parentId !== null),
     )
     router.clearRoutes()
-    router.addRoute({
-      path: '/',
-      redirect: '/workspace',
-    })
-    router.addRoute({
-      path: '/login',
-      name: 'login',
-      component: () => import('@/views/login.vue'),
-    })
+
+    staticRoutes.forEach((route) => router.addRoute(route))
+
     routes.forEach((route) => router.addRoute(route))
 
     return res

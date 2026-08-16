@@ -8,65 +8,67 @@ import { addRoutes } from '@/router/routesHandler.ts'
 import { isEmpty } from '@/utils'
 import { getStorage, removeStorage } from '@/utils/storage'
 
+const routes = [
+  {
+    path: '/',
+    redirect: '/workspace',
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/views/login.vue'),
+  },
+]
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      redirect: '/workspace',
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: () => import('@/views/login.vue'),
-    },
-    // {
-    //   path: '/workspace',
-    //   component: () => import('@/views/index.vue'),
-    //   children: [
-    //     {
-    //       name: 'workspace',
-    //       path: '/workspace',
-    //       component: () => import('@/views/workspace.vue'),
-    //     },
-    //   ],
-    // },
-    // {
-    //   name: 'SystemManage',
-    //   path: '/system',
-    //   component: () => import('@/views/index.vue'),
-    //   children: [
-    //     {
-    //       name: 'user',
-    //       path: '/system/user',
-    //       component: () => import('@/views/system/user.vue'),
-    //     },
-    //   ],
-    // },
+  routes: routes,
+  // {
+  //   path: '/workspace',
+  //   component: () => import('@/views/index.vue'),
+  //   children: [
+  //     {
+  //       name: 'workspace',
+  //       path: '/workspace',
+  //       component: () => import('@/views/workspace.vue'),
+  //     },
+  //   ],
+  // },
+  // {
+  //   name: 'SystemManage',
+  //   path: '/system',
+  //   component: () => import('@/views/index.vue'),
+  //   children: [
+  //     {
+  //       name: 'user',
+  //       path: '/system/user',
+  //       component: () => import('@/views/system/user.vue'),
+  //     },
+  //   ],
+  // },
 
-    // {
-    //   path: '/',
-    //   redirect: '/workspace',
-    //   component: () => import('@/views/index.vue'),
-    //   children: [
-    //     {
-    //       name: 'workspace',
-    //       path: '/workspace',
-    //       component: () => import('@/views/workspace.vue'),
-    //     },
-    //     {
-    //       name: 'user',
-    //       path: '/system/user',
-    //       component: () => import('@/views/system/user.vue'),
-    //     },
-    //     {
-    //       name: 'menu',
-    //       path: '/system/menu',
-    //       component: () => import('@/views/system/menu.vue'),
-    //     },
-    //   ],
-    // },
-  ],
+  // {
+  //   path: '/',
+  //   redirect: '/workspace',
+  //   component: () => import('@/views/index.vue'),
+  //   children: [
+  //     {
+  //       name: 'workspace',
+  //       path: '/workspace',
+  //       component: () => import('@/views/workspace.vue'),
+  //     },
+  //     {
+  //       name: 'user',
+  //       path: '/system/user',
+  //       component: () => import('@/views/system/user.vue'),
+  //     },
+  //     {
+  //       name: 'menu',
+  //       path: '/system/menu',
+  //       component: () => import('@/views/system/menu.vue'),
+  //     },
+  //   ],
+  // },
+  // ],
 })
 
 let isFirst = true
@@ -117,4 +119,4 @@ router.beforeEach(async (to) => {
   }
 })
 
-export default router
+export { router as default, routes }
