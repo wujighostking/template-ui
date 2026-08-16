@@ -18,6 +18,16 @@ export function addRoutes() {
       topRoutes,
       res.data.filter((item: MenuNode) => item.parentId !== null),
     )
+    router.clearRoutes()
+    router.addRoute({
+      path: '/',
+      redirect: '/workspace',
+    })
+    router.addRoute({
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/login.vue'),
+    })
     routes.forEach((route) => router.addRoute(route))
 
     return res

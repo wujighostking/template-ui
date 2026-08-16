@@ -2,14 +2,15 @@ import { ElMessage } from 'element-plus'
 import { createRouter, createWebHistory } from 'vue-router'
 
 import { checkToken } from '@/api/login/checkToken'
+import { CODE } from '@/common/code.ts'
 import { whiteList } from '@/common/constants'
+import { addRoutes } from '@/router/routesHandler.ts'
 import { isEmpty } from '@/utils'
 import { getStorage, removeStorage } from '@/utils/storage'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // ...getRouterPath(viewsMap),
     {
       path: '/',
       redirect: '/workspace',
@@ -68,6 +69,8 @@ const router = createRouter({
   ],
 })
 
+let isFirst = true
+
 // 前置路由导航守卫：校验 token 存在性及有效性，未通过时跳转到登录页
 router.beforeEach(async (to) => {
   // 白名单（如登录/注册页）直接放行
@@ -96,7 +99,22 @@ router.beforeEach(async (to) => {
     return { path: '/login' }
   }
 
-  return true
+  // 动态路由只在首次进入时注册一次，避免每次导航都重复请求并注册
+  try {
+    const res = await addRoutes()
+    if (res?.code !== CODE.SUCCESS) return { path: '/login' }
+
+    // 关键：注册完动态路由后必须返回导航目标以触发重新导航，
+    // 让路由表基于最新路由重新解析，否则本次导航仍沿用旧路由表的"无匹配"结果
+    if (isFirst) {
+      isFirst = false
+      return { ...to, replace: true }
+    }
+
+    return true
+  } catch {
+    return { path: '/login' }
+  }
 })
 
 export default router

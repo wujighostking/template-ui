@@ -5,8 +5,6 @@ import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { login } from '@/api/login'
-import { CODE } from '@/common/code.ts'
-import { addRoutes } from '@/router/routesHandler.ts'
 import type { LoginForm } from '@/schema/loginForm'
 import { setStorage } from '@/utils/storage'
 
@@ -52,7 +50,7 @@ function handleLogin() {
           setStorage('token', data.data)
           ElMessage.success(data.message || '登录成功')
 
-          return addRoutes()
+          router.replace('/')
         },
         (error) => {
           if (__DEV__) {
@@ -62,11 +60,7 @@ function handleLogin() {
           ElMessage.error('登录失败，请检查手机号码或密码')
         },
       )
-      .then((res) => {
-        if (res?.code === CODE.SUCCESS) {
-          router.replace('/')
-        }
-      })
+
       .finally(() => {
         loading.value = false
       })
