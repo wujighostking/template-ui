@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Delete, Edit, Plus, Refresh, Search, Sort } from '@element-plus/icons-vue'
 import { ElDatePicker, ElInput, ElMessage } from 'element-plus'
-import { onBeforeMount, reactive, shallowRef, useTemplateRef } from 'vue'
+import { computed, onBeforeMount, reactive, shallowRef, useTemplateRef } from 'vue'
 
 import { deleteMenu, getMenu } from '@/api/menu.ts'
 import { CODE } from '@/common/code.ts'
@@ -62,13 +62,13 @@ const multipleSelection = shallowRef<any[]>([])
 /** 新增菜单弹窗引用 */
 const menuDialogRef = useTemplateRef<InstanceType<typeof CreateDialog>>('menuDialogRef')
 
-const config: CrudPageConfig = {
+const config = computed<CrudPageConfig>(() => ({
   title: '菜单管理',
   subtitle: '管理菜单权限',
   formItems,
   formModel: searchForm,
   columns,
-  data: tableData,
+  data: tableData.value,
   treeProps: { children: 'children' },
   defaultExpandAll: true,
   onSelectionChange: (selection) => {
@@ -82,7 +82,7 @@ const config: CrudPageConfig = {
     { text: '删除', type: 'danger', plain: true, icon: Delete, onClick: handleDelete },
     { text: '调整排序', plain: true, icon: Sort, onClick: handleAdjustSort },
   ],
-}
+}))
 
 function handleSearch() {
   // 查询逻辑

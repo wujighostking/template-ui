@@ -30,7 +30,7 @@ export interface CrudPageConfig {
   /** 表格列配置 */
   columns?: ColumnConfig[]
   /** 表格数据（支持直接传数组、ref 或 getter，保持响应式） */
-  data?: MaybeRefOrGetter<Record<string, unknown>[]>
+  data?: Record<string, unknown>[]
   /** 工具栏按钮配置 */
   toolbar?: ToolbarButtonConfig[]
   /** 是否显示分页，默认显示 */
