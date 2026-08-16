@@ -3,7 +3,8 @@ import { Delete, Edit, Plus, Refresh, Search, Sort } from '@element-plus/icons-v
 import { ElDatePicker, ElInput, ElMessage } from 'element-plus'
 import { onBeforeMount, reactive, shallowRef, useTemplateRef } from 'vue'
 
-import { getMenu } from '@/api/menu.ts'
+import { deleteMenu, getMenu } from '@/api/menu.ts'
+import { CODE } from '@/common/code.ts'
 import type { FormItemConfig } from '@/components/FormBuilder.vue'
 import CrudPage, { type CrudPageConfig } from '@/components/system/CrudPage.vue'
 import CreateDialog from '@/components/system/menu/CreateDialog.vue'
@@ -117,6 +118,16 @@ function handleEdit() {
 
 function handleDelete() {
   // 删除菜单逻辑
+  if (multipleSelection.value.length === 0) {
+    ElMessage.warning('请先选择要删除的数据')
+    return
+  }
+  deleteMenu(multipleSelection.value.map((item) => item.id)).then((res) => {
+    if (res.code === CODE.SUCCESS) {
+      ElMessage.success(res.message || '删除成功')
+      handleSearch()
+    }
+  })
 }
 
 function handleAdjustSort() {

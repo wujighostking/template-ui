@@ -16,3 +16,7 @@ export function getTopMenu() {
 export function updateMenu(data: MenuDTO) {
   return request({ url: '/menu/update', method: 'PUT', data })
 }
+
+export function deleteMenu(ids: number[]) {
+  return request({ url: `/menu/delete`, method: 'POST', data: ids })
+}
