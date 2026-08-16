@@ -11,32 +11,60 @@ const router = createRouter({
   routes: [
     // ...getRouterPath(viewsMap),
     {
+      path: '/',
+      redirect: '/workspace',
+    },
+    {
       path: '/login',
       name: 'login',
       component: () => import('@/views/login.vue'),
     },
-    {
-      path: '/',
-      redirect: '/workspace',
-      component: () => import('@/views/index.vue'),
-      children: [
-        {
-          name: 'workspace',
-          path: '/workspace',
-          component: () => import('@/views/workspace.vue'),
-        },
-        {
-          name: 'user',
-          path: '/system/user',
-          component: () => import('@/views/system/user.vue'),
-        },
-        {
-          name: 'menu',
-          path: '/system/menu',
-          component: () => import('@/views/system/menu.vue'),
-        },
-      ],
-    },
+    // {
+    //   path: '/workspace',
+    //   component: () => import('@/views/index.vue'),
+    //   children: [
+    //     {
+    //       name: 'workspace',
+    //       path: '/workspace',
+    //       component: () => import('@/views/workspace.vue'),
+    //     },
+    //   ],
+    // },
+    // {
+    //   name: 'SystemManage',
+    //   path: '/system',
+    //   component: () => import('@/views/index.vue'),
+    //   children: [
+    //     {
+    //       name: 'user',
+    //       path: '/system/user',
+    //       component: () => import('@/views/system/user.vue'),
+    //     },
+    //   ],
+    // },
+
+    // {
+    //   path: '/',
+    //   redirect: '/workspace',
+    //   component: () => import('@/views/index.vue'),
+    //   children: [
+    //     {
+    //       name: 'workspace',
+    //       path: '/workspace',
+    //       component: () => import('@/views/workspace.vue'),
+    //     },
+    //     {
+    //       name: 'user',
+    //       path: '/system/user',
+    //       component: () => import('@/views/system/user.vue'),
+    //     },
+    //     {
+    //       name: 'menu',
+    //       path: '/system/menu',
+    //       component: () => import('@/views/system/menu.vue'),
+    //     },
+    //   ],
+    // },
   ],
 })
 

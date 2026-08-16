@@ -64,7 +64,7 @@ function handleLogin() {
       )
       .then((res) => {
         if (res?.code === CODE.SUCCESS) {
-          router.push('/')
+          router.replace('/')
         }
       })
       .finally(() => {
