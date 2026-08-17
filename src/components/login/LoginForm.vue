@@ -42,10 +42,7 @@ function handleLogin() {
     login({ ...form })
       .then(
         (data) => {
-          if (data.code !== 0) {
-            ElMessage.error(data.message || '登录失败，请检查手机号码或密码')
-            return
-          }
+          if (data.code !== 0) return
 
           setStorage('token', data.data)
           ElMessage.success(data.message || '登录成功')

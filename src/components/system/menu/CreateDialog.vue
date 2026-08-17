@@ -160,6 +160,7 @@ const dialogTitle = computed(() => (dialogMode.value === 'add' ? '新增菜单' 
 function open(mode: 'add' | 'edit', data?: Partial<MenuDTO>) {
   dialogMode.value = mode
   Object.assign(formData, createDefaultForm(), data ?? {})
+  formData.routerMeta = JSON.stringify(formData.routerMeta, null, 2)
   dialogVisible.value = true
 }
 
