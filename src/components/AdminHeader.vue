@@ -1,5 +1,30 @@
 <script setup lang="ts">
 import { Bell, House, Search } from '@element-plus/icons-vue'
+import { onBeforeMount, onMounted, shallowRef } from 'vue'
+
+import type { Role } from '@/schema/role.ts'
+import { getStorage } from '@/utils/storage.ts'
+
+const roleName = shallowRef<string | undefined>('')
+
+onBeforeMount(() => {
+  const roles: Role[] = JSON.parse(getStorage('userInfo') || '{}').role
+  if (!roles || roles.length === 0) {
+    console.warn('未获取到用户角色信息，请检查登录状态')
+
+    return
+  }
+
+  let index = 0
+  let minPower = Infinity
+  roles.forEach((role, idx) => {
+    if (role.power < minPower) {
+      minPower = role.power
+      index = idx
+    }
+  })
+  roleName.value = roles[index]?.roleName ?? ''
+})
 </script>
 
 <template>
@@ -7,7 +32,7 @@ import { Bell, House, Search } from '@element-plus/icons-vue'
     <div class="admin-header__left">
       <div class="admin-logo">
         <el-icon><House /></el-icon>
-        <span class="admin-logo__text">Admin Pro</span>
+        <span class="admin-logo__text">云枢管理平台</span>
       </div>
     </div>
     <div class="admin-header__right">
@@ -15,7 +40,7 @@ import { Bell, House, Search } from '@element-plus/icons-vue'
       <el-icon class="header-icon"><Bell /></el-icon>
       <div class="admin-user">
         <el-avatar :size="32" class="admin-user__avatar">A</el-avatar>
-        <span class="admin-user__name">管理员</span>
+        <span class="admin-user__name">{{ roleName }}</span>
       </div>
     </div>
   </header>

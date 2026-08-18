@@ -7,7 +7,7 @@ import { whiteList } from '@/common/constants.ts'
 import type { RequestArgs } from '@/schema/request.ts'
 import type { Response } from '@/schema/response.ts'
 import { isEmpty } from '@/utils'
-import { getStorage } from '@/utils/storage'
+import { getToken } from '@/utils/storage'
 import { isBoolean, isString } from '@/utils/types.ts'
 
 export function createInstance(): AxiosInstance {
@@ -16,7 +16,7 @@ export function createInstance(): AxiosInstance {
     timeout: 10000,
   })
 
-  if (isEmpty(getStorage('token')) && !whiteList.has(new URL(window.location.href).pathname)) {
+  if (isEmpty(getToken()) && !whiteList.has(new URL(window.location.href).pathname)) {
     if (__DEV__) {
       console.error('Token is empty, redirecting to login page')
     }
@@ -28,7 +28,7 @@ export function createInstance(): AxiosInstance {
 
   instance.interceptors.request.use(
     (config) => {
-      config.headers['Authorization'] = `Bearer ${getStorage('token')}`
+      config.headers['Authorization'] = `Bearer ${getToken()}`
       return config
     },
     (error) => {

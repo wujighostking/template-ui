@@ -1,17 +1,16 @@
 import { ElMessage } from 'element-plus'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
-import { checkToken } from '@/api/login/checkToken'
-import { CODE } from '@/common/code.ts'
+import { checkToken } from '@/api/login/checkToken.ts'
 import { whiteList } from '@/common/constants'
-import { addRoutes } from '@/router/routesHandler.ts'
 import { isEmpty } from '@/utils'
-import { getStorage, removeStorage } from '@/utils/storage'
+import { getToken, removeStorage } from '@/utils/storage'
 
-const routes = [
+const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    redirect: '/workspace',
+    // redirect: '/workspace',
+    component: () => import('@/views/index.vue'),
   },
   {
     path: '/login',
@@ -80,7 +79,7 @@ router.beforeEach(async (to) => {
     return true
   }
 
-  const token = getStorage('token')
+  const token = getToken()
 
   // token 不存在或为空时跳转到登录页
   if (isEmpty(token)) {
@@ -92,7 +91,7 @@ router.beforeEach(async (to) => {
     const data = await checkToken(token!)
     if (data.code != 0) {
       ElMessage.error(data.message ?? '登录已过期，请重新登录')
-      removeStorage('token')
+      removeStorage('userInfo')
       return { path: '/login' }
     }
   } catch {
@@ -102,21 +101,21 @@ router.beforeEach(async (to) => {
   }
 
   // 动态路由只在首次进入时注册一次，避免每次导航都重复请求并注册
-  try {
-    const res = await addRoutes()
-    if (res?.code !== CODE.SUCCESS) return { path: '/login' }
-
-    // 关键：注册完动态路由后必须返回导航目标以触发重新导航，
-    // 让路由表基于最新路由重新解析，否则本次导航仍沿用旧路由表的"无匹配"结果
-    if (isFirst) {
-      isFirst = false
-      return { ...to, replace: true }
-    }
-
-    return true
-  } catch {
-    return { path: '/login' }
-  }
+  // try {
+  //   const res = await addRoutes()
+  //   if (res?.code !== CODE.SUCCESS) return { path: '/login' }
+  //
+  //   // 关键：注册完动态路由后必须返回导航目标以触发重新导航，
+  //   // 让路由表基于最新路由重新解析，否则本次导航仍沿用旧路由表的"无匹配"结果
+  //   if (isFirst) {
+  //     isFirst = false
+  //     return { ...to, replace: true }
+  //   }
+  //
+  //   return true
+  // } catch {
+  //   return { path: '/login' }
+  // }
 })
 
 export { router as default, routes }

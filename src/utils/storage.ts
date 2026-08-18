@@ -9,3 +9,7 @@ export function setStorage(key: string, value: any) {
 export function removeStorage(key: string) {
   localStorage.removeItem(key)
 }
+
+export function getToken() {
+  return JSON.parse(getStorage('userInfo') || '{}')?.token
+}

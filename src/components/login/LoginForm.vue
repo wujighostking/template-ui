@@ -44,7 +44,7 @@ function handleLogin() {
         (data) => {
           if (data.code !== 0) return
 
-          setStorage('token', data.data)
+          setStorage('userInfo', JSON.stringify(data.data))
           ElMessage.success(data.message || '登录成功')
 
           router.replace('/')

@@ -5,25 +5,25 @@ import AdminHeader from '@/components/AdminHeader.vue'
 
 <template>
   <div class="admin-layout">
-    <!-- 头部 -->
+    <!--    &lt;!&ndash; 头部 &ndash;&gt;-->
     <AdminHeader />
 
-    <div class="admin-body">
-      <!-- 左侧菜单栏 -->
-      <AdminAside />
+    <!--    <div class="admin-body">-->
+    <!--      &lt;!&ndash; 左侧菜单栏 &ndash;&gt;-->
+    <!--      <AdminAside />-->
 
-      <!-- 右侧内容主体区 -->
-      <main class="admin-main">
-        <el-card shadow="never" class="content-card">
-          <el-breadcrumb separator="/" class="breadcrumb">
-            <el-breadcrumb-item>首页</el-breadcrumb-item>
-            <el-breadcrumb-item>工作台</el-breadcrumb-item>
-          </el-breadcrumb>
+    <!--      &lt;!&ndash; 右侧内容主体区 &ndash;&gt;-->
+    <!--      <main class="admin-main">-->
+    <!--        <el-card shadow="never" class="content-card">-->
+    <!--          <el-breadcrumb separator="/" class="breadcrumb">-->
+    <!--            <el-breadcrumb-item>首页</el-breadcrumb-item>-->
+    <!--            <el-breadcrumb-item>工作台</el-breadcrumb-item>-->
+    <!--          </el-breadcrumb>-->
 
-          <router-view />
-        </el-card>
-      </main>
-    </div>
+    <!--          <router-view />-->
+    <!--        </el-card>-->
+    <!--      </main>-->
+    <!--    </div>-->
   </div>
 </template>
 
