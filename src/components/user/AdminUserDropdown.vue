@@ -6,10 +6,12 @@ import { useRouter } from 'vue-router'
 
 import { logout } from '@/api/login'
 import AdminUserProfileDialog from '@/components/user/AdminUserProfileDialog.vue'
+import AdminUserResetPasswordDialog from '@/components/user/AdminUserResetPasswordDialog.vue'
 import type { Role } from '@/schema/role.ts'
 import { getStorage, removeStorage } from '@/utils/storage.ts'
 
 const profileDialogRef = ref<InstanceType<typeof AdminUserProfileDialog>>()
+const resetPasswordDialogRef = ref<InstanceType<typeof AdminUserResetPasswordDialog>>()
 
 const router = useRouter()
 const roleName = shallowRef<string | undefined>('')
@@ -46,6 +48,8 @@ const handleCommand = async (command: string) => {
   }
 
   if (command == 'resetPassword') {
+    resetPasswordDialogRef.value?.open()
+
     return
   }
 
@@ -89,6 +93,7 @@ const handleCommand = async (command: string) => {
   </el-dropdown>
 
   <AdminUserProfileDialog ref="profileDialogRef" />
+  <AdminUserResetPasswordDialog ref="resetPasswordDialogRef" />
 </template>
 
 <style scoped lang="scss">

@@ -7,3 +7,7 @@ export function login(data: any) {
 export function logout() {
   return request({ url: '/auth/logout', method: 'POST' })
 }
+
+export function resetPassword(data: any) {
+  return request({ url: '/auth/reset-password', method: 'POST', data })
+}
