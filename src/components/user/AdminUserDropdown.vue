@@ -4,6 +4,7 @@ import { ElMessageBox } from 'element-plus'
 import { onBeforeMount, ref, shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { logout } from '@/api/login'
 import AdminUserProfileDialog from '@/components/user/AdminUserProfileDialog.vue'
 import type { Role } from '@/schema/role.ts'
 import { getStorage, removeStorage } from '@/utils/storage.ts'
@@ -44,19 +45,20 @@ const handleCommand = async (command: string) => {
     return
   }
 
-  if (command !== 'logout') return
-
-  try {
-    await ElMessageBox.confirm('确定要退出登录吗？', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning',
-    })
-    removeStorage('userInfo')
-    router.replace('/login')
-  } catch {
-    // 用户取消退出
+  if (command == 'resetPassword') {
+    return
   }
+
+  ElMessageBox.confirm('确定要退出登录吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  })
+    .then(() => logout())
+    .then(() => {
+      removeStorage('userInfo')
+      router.replace('/login')
+    })
 }
 </script>
 
@@ -73,7 +75,7 @@ const handleCommand = async (command: string) => {
           <el-icon><User /></el-icon>
           <span>用户信息</span>
         </el-dropdown-item>
-        <el-dropdown-item command="password">
+        <el-dropdown-item command="resetPassword">
           <el-icon><Lock /></el-icon>
           <span>修改密码</span>
         </el-dropdown-item>
