@@ -1,17 +1,24 @@
 <script setup lang="ts">
 import { Delete, Edit, Plus, Refresh, Search } from '@element-plus/icons-vue'
 import { ElButton, ElDatePicker, ElInput, ElSelect } from 'element-plus'
-import { h, reactive } from 'vue'
+import { h, onBeforeMount, reactive, ref, shallowRef } from 'vue'
 
+import { getRolePage } from '@/api/role.ts'
 import type { FormItemConfig } from '@/components/FormBuilder.vue'
 import FormBuilder from '@/components/FormBuilder.vue'
-import TableBuilder, { type ColumnConfig } from '@/components/TableBuilder.vue'
+import TableBuilder, { type ColumnConfig, type PageQuery } from '@/components/TableBuilder.vue'
+import type { Role } from '@/schema/role.ts'
 
-const searchForm = reactive<Record<string, unknown>>({
-  roleName: '',
-  roleCode: '',
-  status: '',
-  createTime: '',
+const searchForm = reactive<{
+  roleName?: string
+  roleCode?: string
+  status?: string
+  createTime: string[]
+}>({
+  roleName: undefined,
+  roleCode: undefined,
+  status: undefined,
+  createTime: [],
 })
 
 const formItems: FormItemConfig[] = [
@@ -24,9 +31,9 @@ const formItems: FormItemConfig[] = [
   },
   {
     model: 'roleCode',
-    label: '字符代码',
+    label: '角色代码',
     type: ElInput,
-    props: { placeholder: '请输入字符代码', clearable: true },
+    props: { placeholder: '请输入角色代码', clearable: true },
     col: { span: 6 },
   },
   {
@@ -47,7 +54,7 @@ const formItems: FormItemConfig[] = [
 
 const columns: ColumnConfig[] = [
   { prop: 'roleName', label: '角色名称', align: 'center' },
-  { prop: 'roleCode', label: '字符代码', align: 'center' },
+  { prop: 'roleCode', label: '角色代码', align: 'center' },
   { prop: 'sort', label: '排序', align: 'center' },
   { prop: 'status', label: '状态', align: 'center' },
   { prop: 'createTime', label: '创建时间', align: 'center' },
@@ -99,36 +106,66 @@ const columns: ColumnConfig[] = [
   },
 ]
 
-const tableData: Record<string, unknown>[] = [
-  {
-    roleName: '超级管理员',
-    roleCode: 'admin',
-    sort: 1,
-    status: '正常',
-    createTime: '2024-01-01 09:00',
-  },
-  {
-    roleName: '普通用户',
-    roleCode: 'common',
-    sort: 2,
-    status: '正常',
-    createTime: '2024-03-15 10:20',
-  },
-  {
-    roleName: '审计员',
-    roleCode: 'audit',
-    sort: 3,
-    status: '正常',
-    createTime: '2024-04-20 11:08',
-  },
-]
+const tableData = shallowRef<Role[]>([])
+
+/** 分页总条数，查询后同步给 TableBuilder 展示 */
+const total = ref(0)
+
+/** 分页查询参数 */
+const pageQuery = reactive({
+  current: 1,
+  size: 10,
+})
 
 function handleSearch() {
-  // 查询逻辑
+  const params: Record<string, unknown> = {
+    page: pageQuery.current,
+    size: pageQuery.size,
+
+    roleName: searchForm.roleName?.trim(),
+    roleCode: searchForm.roleCode?.trim(),
+    status: searchForm.status,
+    createTime: searchForm.createTime,
+  }
+
+  getRolePage(params).then((res) => {
+    const data = res.data as { records?: Role[]; total?: number }
+    const records = data?.records ?? []
+    // 按 power 升序排序，power 值越小越靠前
+
+    tableData.value = records
+      .sort((a, b) => (a.power ?? 0) - (b.power ?? 0))
+      .map((item, index) => ({
+        ...item,
+        sort: index + 1,
+        status: item.deleted === 0 ? '正常' : '删除',
+      }))
+    total.value = data?.total ?? 0
+  })
 }
 
 function handleReset() {
-  // 重置逻辑
+  Object.assign(searchForm, {
+    roleName: undefined,
+    roleCode: undefined,
+    status: undefined,
+    createTime: [],
+  })
+  pageQuery.current = 1
+  handleSearch()
+}
+
+/** 分页：切换每页条数时回到第一页重新查询 */
+function handleSizeChange(query: PageQuery) {
+  pageQuery.size = query.size
+  pageQuery.current = 1
+  handleSearch()
+}
+
+/** 分页：切换页码时重新查询 */
+function handleCurrentChange(query: PageQuery) {
+  pageQuery.current = query.current
+  handleSearch()
 }
 
 function handleAdd() {
@@ -160,6 +197,10 @@ function handleDeleteRow(row: Record<string, unknown>) {
   // 删除指定行角色
   console.log('删除', row)
 }
+
+onBeforeMount(() => {
+  handleSearch()
+})
 </script>
 
 <template>
@@ -188,7 +229,14 @@ function handleDeleteRow(row: Record<string, unknown>) {
         <el-button @click="handleRefresh">刷新</el-button>
       </div>
 
-      <TableBuilder :columns="columns" :data="tableData" row-key="id" />
+      <TableBuilder
+        :columns="columns"
+        :data="tableData"
+        :total="total"
+        row-key="id"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
     </el-card>
   </div>
 </template>
