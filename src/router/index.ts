@@ -9,8 +9,8 @@ import { getToken, removeStorage } from '@/utils/storage'
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    // redirect: '/workspace',
-    component: () => import('@/views/index.vue'),
+    redirect: '/workspace',
+    // component: () => import('@/views/index.vue'),
   },
   {
     path: '/login',
@@ -20,54 +20,57 @@ const routes: RouteRecordRaw[] = [
 ]
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: routes,
-  // {
-  //   path: '/workspace',
-  //   component: () => import('@/views/index.vue'),
-  //   children: [
-  //     {
-  //       name: 'workspace',
-  //       path: '/workspace',
-  //       component: () => import('@/views/workspace.vue'),
-  //     },
-  //   ],
-  // },
-  // {
-  //   name: 'SystemManage',
-  //   path: '/system',
-  //   component: () => import('@/views/index.vue'),
-  //   children: [
-  //     {
-  //       name: 'user',
-  //       path: '/system/user',
-  //       component: () => import('@/views/system/user.vue'),
-  //     },
-  //   ],
-  // },
-
-  // {
-  //   path: '/',
-  //   redirect: '/workspace',
-  //   component: () => import('@/views/index.vue'),
-  //   children: [
-  //     {
-  //       name: 'workspace',
-  //       path: '/workspace',
-  //       component: () => import('@/views/workspace.vue'),
-  //     },
-  //     {
-  //       name: 'user',
-  //       path: '/system/user',
-  //       component: () => import('@/views/system/user.vue'),
-  //     },
-  //     {
-  //       name: 'menu',
-  //       path: '/system/menu',
-  //       component: () => import('@/views/system/menu.vue'),
-  //     },
-  //   ],
-  // },
-  // ],
+  // routes: routes,
+  routes: [
+    ...routes,
+    {
+      path: '/workspace',
+      component: () => import('@/views/index.vue'),
+      children: [
+        {
+          name: 'workspace',
+          path: '/workspace',
+          component: () => import('@/views/workspace.vue'),
+        },
+      ],
+    },
+    {
+      path: '/system',
+      component: () => import('@/views/index.vue'),
+      children: [
+        {
+          name: 'user',
+          path: '/system/user',
+          component: () => import('@/views/system/user.vue'),
+        },
+        {
+          name: 'role',
+          path: '/system/role',
+          component: () => import('@/views/system/role.vue'),
+        },
+        {
+          name: 'menu',
+          path: '/system/menu',
+          component: () => import('@/views/system/menu.vue'),
+        },
+        {
+          name: 'dept',
+          path: '/system/dept',
+          component: () => import('@/views/system/dept.vue'),
+        },
+        {
+          name: 'post',
+          path: '/system/post',
+          component: () => import('@/views/system/post.vue'),
+        },
+        {
+          name: 'dict',
+          path: '/system/dict',
+          component: () => import('@/views/system/dict.vue'),
+        },
+      ],
+    },
+  ],
 })
 
 let isFirst = true

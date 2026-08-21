@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { Delete, Edit, Plus, Refresh, Search } from '@element-plus/icons-vue'
-import { ElDatePicker, ElInput, ElSelect } from 'element-plus'
-import { reactive, shallowRef } from 'vue'
+import { ElButton, ElDatePicker, ElInput, ElSelect } from 'element-plus'
+import { h, reactive } from 'vue'
 
 import type { FormItemConfig } from '@/components/FormBuilder.vue'
-import CrudPage, { type CrudPageConfig } from '@/components/system/CrudPage.vue'
-import type { ColumnConfig } from '@/components/TableBuilder.vue'
+import FormBuilder from '@/components/FormBuilder.vue'
+import TableBuilder, { type ColumnConfig } from '@/components/TableBuilder.vue'
 
 const searchForm = reactive<Record<string, unknown>>({
   roleName: '',
@@ -46,12 +46,57 @@ const formItems: FormItemConfig[] = [
 ]
 
 const columns: ColumnConfig[] = [
-  { type: 'selection', width: 50 },
-  { prop: 'roleName', label: '角色名称' },
-  { prop: 'roleCode', label: '字符代码' },
-  { prop: 'sort', label: '排序' },
-  { prop: 'status', label: '状态' },
-  { prop: 'createTime', label: '创建时间' },
+  { prop: 'roleName', label: '角色名称', align: 'center' },
+  { prop: 'roleCode', label: '字符代码', align: 'center' },
+  { prop: 'sort', label: '排序', align: 'center' },
+  { prop: 'status', label: '状态', align: 'center' },
+  { prop: 'createTime', label: '创建时间', align: 'center' },
+  {
+    prop: 'operation',
+    label: '操作',
+    align: 'center',
+    width: 280,
+    slots: {
+      default: (scope) => {
+        const row = scope.row as Record<string, unknown>
+        return h('div', { class: 'row-operation' }, [
+          h(
+            ElButton,
+            {
+              type: 'primary',
+              link: true,
+              size: 'small',
+              icon: Search,
+              onClick: () => handleView(row),
+            },
+            () => '查看',
+          ),
+          h(
+            ElButton,
+            {
+              type: 'primary',
+              link: true,
+              size: 'small',
+              icon: Edit,
+              onClick: () => handleEditRow(row),
+            },
+            () => '编辑',
+          ),
+          h(
+            ElButton,
+            {
+              type: 'danger',
+              link: true,
+              size: 'small',
+              icon: Delete,
+              onClick: () => handleDeleteRow(row),
+            },
+            () => '删除',
+          ),
+        ])
+      },
+    },
+  },
 ]
 
 const tableData: Record<string, unknown>[] = [
@@ -77,30 +122,6 @@ const tableData: Record<string, unknown>[] = [
     createTime: '2024-04-20 11:08',
   },
 ]
-
-/** 表格选中的行 */
-const multipleSelection = shallowRef<any[]>([])
-
-const config: CrudPageConfig = {
-  title: '角色管理',
-  subtitle: '管理系统角色与权限',
-  formItems,
-  formModel: searchForm,
-  columns,
-  data: tableData,
-  onSelectionChange: (selection) => {
-    multipleSelection.value = selection
-  },
-  toolbar: [
-    { text: '查询', type: 'primary', plain: true, icon: Search, onClick: handleSearch },
-    { text: '重置', type: 'default', plain: true, icon: Refresh, onClick: handleReset },
-    { text: '新增', type: 'primary', icon: Plus, onClick: handleAdd },
-    { text: '编辑', type: 'primary', plain: true, icon: Edit, onClick: handleEdit },
-    { text: '删除', type: 'danger', plain: true, icon: Delete, onClick: handleDelete },
-    { text: '分配用户', onClick: handleAssignUser },
-    { text: '刷新', onClick: handleRefresh },
-  ],
-}
 
 function handleSearch() {
   // 查询逻辑
@@ -129,8 +150,110 @@ function handleAssignUser() {
 function handleRefresh() {
   // 刷新逻辑
 }
+
+/** 行内操作：查看 */
+function handleView(row: Record<string, unknown>) {
+  // 查看指定行角色
+  console.log('查看', row)
+}
+
+/** 行内操作：编辑 */
+function handleEditRow(row: Record<string, unknown>) {
+  // 编辑指定行角色
+  console.log('编辑', row)
+}
+
+/** 行内操作：删除 */
+function handleDeleteRow(row: Record<string, unknown>) {
+  // 删除指定行角色
+  console.log('删除', row)
+}
 </script>
 
 <template>
-  <CrudPage :config="config" />
+  <div class="role-page">
+    <div class="role-page__header">
+      <h2 class="role-page__title">角色管理</h2>
+      <p class="role-page__subtitle">管理系统角色与权限</p>
+    </div>
+
+    <el-card shadow="never" class="role-page__search">
+      <FormBuilder
+        :form="searchForm"
+        :form-items="formItems"
+        :row-props="{ gutter: 16 }"
+        label-position="right"
+        label-width="auto"
+      />
+    </el-card>
+
+    <el-card shadow="never" class="role-page__table">
+      <div class="role-page__toolbar">
+        <el-button type="primary" plain :icon="Search" @click="handleSearch">查询</el-button>
+        <el-button type="default" plain :icon="Refresh" @click="handleReset">重置</el-button>
+        <el-button type="primary" :icon="Plus" @click="handleAdd">新增</el-button>
+        <el-button type="primary" plain :icon="Edit" @click="handleEdit">编辑</el-button>
+        <el-button type="danger" plain :icon="Delete" @click="handleDelete">删除</el-button>
+        <el-button @click="handleAssignUser">分配用户</el-button>
+        <el-button @click="handleRefresh">刷新</el-button>
+      </div>
+
+      <TableBuilder :columns="columns" :data="tableData" row-key="id" />
+    </el-card>
+  </div>
 </template>
+
+<style scoped lang="scss">
+.role-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+
+  .role-page__header {
+    padding: 4px 4px 0;
+
+    .role-page__title {
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .role-page__subtitle {
+      margin: 0;
+      font-size: 13px;
+      color: #64748b;
+    }
+  }
+
+  .role-page__search {
+    border-radius: 8px;
+
+    :deep(.el-card__body) {
+      display: flex;
+      align-items: center;
+      min-height: 64px;
+    }
+
+    :deep(.el-form) {
+      width: 100%;
+    }
+
+    :deep(.el-form-item) {
+      margin-bottom: 0;
+    }
+  }
+
+  .role-page__table {
+    border-radius: 8px;
+  }
+
+  .role-page__toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+}
+</style>

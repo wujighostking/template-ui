@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { Delete, Edit, Plus, Refresh, Search } from '@element-plus/icons-vue'
-import { ElDatePicker, ElInput, ElSelect } from 'element-plus'
-import { reactive } from 'vue'
+import { ElButton, ElDatePicker, ElInput, ElSelect } from 'element-plus'
+import { h, reactive } from 'vue'
 
 import type { FormItemConfig } from '@/components/FormBuilder.vue'
-import CrudPage, { type CrudPageConfig } from '@/components/system/CrudPage.vue'
-import type { ColumnConfig } from '@/components/TableBuilder.vue'
+import FormBuilder from '@/components/FormBuilder.vue'
+import TableBuilder, { type ColumnConfig } from '@/components/TableBuilder.vue'
 
 const searchForm = reactive<Record<string, unknown>>({
   username: '',
@@ -53,12 +53,57 @@ const formItems: FormItemConfig[] = [
 ]
 
 const columns: ColumnConfig[] = [
-  { type: 'selection', width: 50 },
-  { prop: 'username', label: '用户名' },
-  { prop: 'nickname', label: '昵称' },
-  { prop: 'dept', label: '部门' },
-  { prop: 'phone', label: '手机号' },
-  { prop: 'createTime', label: '创建时间' },
+  { prop: 'username', label: '用户名', align: 'center' },
+  { prop: 'nickname', label: '昵称', align: 'center' },
+  { prop: 'dept', label: '部门', align: 'center' },
+  { prop: 'phone', label: '手机号', align: 'center' },
+  { prop: 'createTime', label: '创建时间', align: 'center' },
+  {
+    prop: 'operation',
+    label: '操作',
+    align: 'center',
+    width: 280,
+    slots: {
+      default: (scope) => {
+        const row = scope.row as Record<string, unknown>
+        return h('div', { class: 'row-operation' }, [
+          h(
+            ElButton,
+            {
+              type: 'primary',
+              link: true,
+              size: 'small',
+              icon: Search,
+              onClick: () => handleView(row),
+            },
+            () => '查看',
+          ),
+          h(
+            ElButton,
+            {
+              type: 'primary',
+              link: true,
+              size: 'small',
+              icon: Edit,
+              onClick: () => handleEditRow(row),
+            },
+            () => '编辑',
+          ),
+          h(
+            ElButton,
+            {
+              type: 'danger',
+              link: true,
+              size: 'small',
+              icon: Delete,
+              onClick: () => handleDeleteRow(row),
+            },
+            () => '删除',
+          ),
+        ])
+      },
+    },
+  },
 ]
 
 const tableData: Record<string, unknown>[] = [
@@ -85,25 +130,6 @@ const tableData: Record<string, unknown>[] = [
   },
 ]
 
-const config: CrudPageConfig = {
-  title: '用户管理',
-  subtitle: '管理系统用户账号',
-  formItems,
-  formModel: searchForm,
-  columns,
-  data: tableData,
-  toolbar: [
-    { text: '查询', type: 'primary', plain: true, icon: Search, onClick: handleSearch },
-    { text: '重置', type: 'default', plain: true, icon: Refresh, onClick: handleReset },
-    { text: '新增', type: 'primary', icon: Plus, onClick: handleAdd },
-    { text: '编辑', type: 'primary', plain: true, icon: Edit, onClick: handleEdit },
-    { text: '删除', type: 'danger', plain: true, icon: Delete, onClick: handleDelete },
-    { text: '导入', onClick: handleImport },
-    { text: '导出', onClick: handleExport },
-    { text: '刷新', icon: Refresh, onClick: handleRefresh },
-  ],
-}
-
 function handleSearch() {
   // 查询逻辑
 }
@@ -115,12 +141,29 @@ function handleReset() {
 function handleAdd() {
   // 新增用户逻辑
 }
-function handleEdit() {
-  // 编辑用户逻辑
+
+/** 行内操作：查看 */
+function handleView(row: Record<string, unknown>) {
+  // 查看指定行用户
+  console.log('查看', row)
 }
 
-function handleDelete() {
-  // 删除用户逻辑
+/** 行内操作：新增（在指定行附近新增用户） */
+function handleAddRow(row: Record<string, unknown>) {
+  // 基于指定行新增用户
+  console.log('新增', row)
+}
+
+/** 行内操作：编辑 */
+function handleEditRow(row: Record<string, unknown>) {
+  // 编辑指定行用户
+  console.log('编辑', row)
+}
+
+/** 行内操作：删除 */
+function handleDeleteRow(row: Record<string, unknown>) {
+  // 删除指定行用户
+  console.log('删除', row)
 }
 
 function handleImport() {
@@ -137,5 +180,88 @@ function handleRefresh() {
 </script>
 
 <template>
-  <CrudPage :config="config" />
+  <div class="user-page">
+    <div class="user-page__header">
+      <h2 class="user-page__title">用户管理</h2>
+      <p class="user-page__subtitle">管理系统用户账号</p>
+    </div>
+
+    <el-card shadow="never" class="user-page__search">
+      <FormBuilder
+        :form="searchForm"
+        :form-items="formItems"
+        :row-props="{ gutter: 16 }"
+        label-position="right"
+        label-width="auto"
+      />
+    </el-card>
+
+    <el-card shadow="never" class="user-page__table">
+      <div class="user-page__toolbar">
+        <el-button type="primary" plain :icon="Search" @click="handleSearch">查询</el-button>
+        <el-button type="default" plain :icon="Refresh" @click="handleReset">重置</el-button>
+        <el-button type="primary" :icon="Plus" @click="handleAdd">新增</el-button>
+        <el-button @click="handleImport">导入</el-button>
+        <el-button @click="handleExport">导出</el-button>
+        <el-button :icon="Refresh" @click="handleRefresh">刷新</el-button>
+      </div>
+
+      <TableBuilder :columns="columns" :data="tableData" row-key="id" />
+    </el-card>
+  </div>
 </template>
+
+<style scoped lang="scss">
+.user-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+
+  .user-page__header {
+    padding: 4px 4px 0;
+
+    .user-page__title {
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .user-page__subtitle {
+      margin: 0;
+      font-size: 13px;
+      color: #64748b;
+    }
+  }
+
+  .user-page__search {
+    border-radius: 8px;
+
+    :deep(.el-card__body) {
+      display: flex;
+      align-items: center;
+      min-height: 64px;
+    }
+
+    :deep(.el-form) {
+      width: 100%;
+    }
+
+    :deep(.el-form-item) {
+      margin-bottom: 0;
+    }
+  }
+
+  .user-page__table {
+    border-radius: 8px;
+  }
+
+  .user-page__toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+}
+</style>

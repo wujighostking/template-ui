@@ -95,11 +95,11 @@ function handleMenuSelect(index: string) {
 }
 
 onBeforeMount(() => {
-  getMenu().then((res) => {
-    if (res.code === CODE.SUCCESS) {
-      menus.value = buildMenuTree(res.data ?? [])
-    }
-  })
+  // getMenu().then((res) => {
+  //   if (res.code === CODE.SUCCESS) {
+  //     menus.value = buildMenuTree(res.data ?? [])
+  //   }
+  // })
 })
 </script>
 
