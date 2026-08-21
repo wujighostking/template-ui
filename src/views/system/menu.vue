@@ -125,16 +125,6 @@ function handleAdd() {
   menuDialogRef.value?.open('add')
 }
 
-function handleEdit() {
-  // 已去除表格勾选功能，请使用行内"编辑"按钮
-  ElMessage.info('请使用行内"编辑"按钮')
-}
-
-function handleDelete() {
-  // 已去除表格勾选功能，请使用行内"删除"按钮
-  ElMessage.info('请使用行内"删除"按钮')
-}
-
 function handleAdjustSort() {
   // 调整排序逻辑
 }
@@ -152,7 +142,7 @@ function handleEditRow(row: Record<string, unknown>) {
 
 /** 行内操作：删除 */
 function handleDeleteRow(row: Record<string, unknown>) {
-  deleteMenu([row.id as string]).then((res) => {
+  deleteMenu([row.id as number]).then((res) => {
     if (res.code === CODE.SUCCESS) {
       ElMessage.success(res.message || '删除成功')
       handleSearch()
@@ -187,8 +177,6 @@ onBeforeMount(() => {
         <el-button type="primary" plain :icon="Search" @click="handleSearch">查询</el-button>
         <el-button type="default" plain :icon="Refresh" @click="handleReset">重置</el-button>
         <el-button type="primary" :icon="Plus" @click="handleAdd">新增</el-button>
-        <el-button type="primary" plain :icon="Edit" @click="handleEdit">编辑</el-button>
-        <el-button type="danger" plain :icon="Delete" @click="handleDelete">删除</el-button>
         <el-button plain :icon="Sort" @click="handleAdjustSort">调整排序</el-button>
       </div>
 

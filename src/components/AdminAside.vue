@@ -44,8 +44,6 @@ const menus = shallowRef<MenuItem[]>([
       { componentPath: '/system/user', menuName: '用户管理', icon: 'User' },
       { componentPath: '/system/role', menuName: '角色管理', icon: 'Key' },
       { componentPath: '/system/menu', menuName: '菜单管理', icon: 'MenuIcon' },
-      { componentPath: '/system/dept', menuName: '部门管理', icon: 'OfficeBuilding' },
-      { componentPath: '/system/post', menuName: '岗位管理', icon: 'Postcard' },
       { componentPath: '/system/dict', menuName: '字典管理', icon: 'Notebook' },
     ],
   },

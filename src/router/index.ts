@@ -54,16 +54,6 @@ const router = createRouter({
           component: () => import('@/views/system/menu.vue'),
         },
         {
-          name: 'dept',
-          path: '/system/dept',
-          component: () => import('@/views/system/dept.vue'),
-        },
-        {
-          name: 'post',
-          path: '/system/post',
-          component: () => import('@/views/system/post.vue'),
-        },
-        {
           name: 'dict',
           path: '/system/dict',
           component: () => import('@/views/system/dict.vue'),

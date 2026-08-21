@@ -55,7 +55,6 @@ const formItems: FormItemConfig[] = [
 const columns: ColumnConfig[] = [
   { prop: 'username', label: '用户名', align: 'center' },
   { prop: 'nickname', label: '昵称', align: 'center' },
-  { prop: 'dept', label: '部门', align: 'center' },
   { prop: 'phone', label: '手机号', align: 'center' },
   { prop: 'createTime', label: '创建时间', align: 'center' },
   {
@@ -146,12 +145,6 @@ function handleAdd() {
 function handleView(row: Record<string, unknown>) {
   // 查看指定行用户
   console.log('查看', row)
-}
-
-/** 行内操作：新增（在指定行附近新增用户） */
-function handleAddRow(row: Record<string, unknown>) {
-  // 基于指定行新增用户
-  console.log('新增', row)
 }
 
 /** 行内操作：编辑 */

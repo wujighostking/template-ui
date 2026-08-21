@@ -152,14 +152,6 @@ function handleAdd() {
   // 新增字典逻辑
 }
 
-function handleEdit() {
-  // 编辑字典逻辑
-}
-
-function handleDelete() {
-  // 删除字典逻辑
-}
-
 function handleRefresh() {
   // 刷新逻辑
 }
@@ -205,8 +197,6 @@ function handleDeleteRow(row: Record<string, unknown>) {
         <el-button type="primary" plain :icon="Search" @click="handleSearch">查询</el-button>
         <el-button type="default" plain :icon="Refresh" @click="handleReset">重置</el-button>
         <el-button type="primary" :icon="Plus" @click="handleAdd">新增</el-button>
-        <el-button type="primary" plain :icon="Edit" @click="handleEdit">编辑</el-button>
-        <el-button type="danger" plain :icon="Delete" @click="handleDelete">删除</el-button>
         <el-button :icon="Refresh" @click="handleRefresh">刷新</el-button>
       </div>
 

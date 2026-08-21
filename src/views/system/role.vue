@@ -135,14 +135,6 @@ function handleAdd() {
   // 新增角色逻辑
 }
 
-function handleEdit() {
-  // 编辑角色逻辑
-}
-
-function handleDelete() {
-  // 删除角色逻辑
-}
-
 function handleAssignUser() {
   // 分配用户逻辑
 }
@@ -192,8 +184,6 @@ function handleDeleteRow(row: Record<string, unknown>) {
         <el-button type="primary" plain :icon="Search" @click="handleSearch">查询</el-button>
         <el-button type="default" plain :icon="Refresh" @click="handleReset">重置</el-button>
         <el-button type="primary" :icon="Plus" @click="handleAdd">新增</el-button>
-        <el-button type="primary" plain :icon="Edit" @click="handleEdit">编辑</el-button>
-        <el-button type="danger" plain :icon="Delete" @click="handleDelete">删除</el-button>
         <el-button @click="handleAssignUser">分配用户</el-button>
         <el-button @click="handleRefresh">刷新</el-button>
       </div>
