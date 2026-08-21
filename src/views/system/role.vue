@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Delete, Edit, Plus, Refresh, Search } from '@element-plus/icons-vue'
-import { ElButton, ElDatePicker, ElInput, ElSelect } from 'element-plus'
+import { ElButton, ElDatePicker, ElInput, ElOption, ElSelect } from 'element-plus'
 import { h, onBeforeMount, reactive, ref, shallowRef } from 'vue'
 
 import { getRolePage } from '@/api/role.ts'
@@ -42,12 +42,24 @@ const formItems: FormItemConfig[] = [
     type: ElSelect,
     props: { placeholder: '请选择状态', clearable: true },
     col: { span: 6 },
+    slots: {
+      default: () => [
+        h(ElOption, { label: '正常', value: 0 }),
+        h(ElOption, { label: '禁用', value: 1 }),
+      ],
+    },
   },
   {
     model: 'createTime',
     label: '创建时间',
     type: ElDatePicker,
-    props: { placeholder: '请输入创建时间', clearable: true, type: 'datetimerange' },
+    props: {
+      placeholder: '请输入创建时间',
+      clearable: true,
+      type: 'datetimerange',
+      format: 'YYYY-MM-DD HH:mm:ss',
+      valueFormat: 'YYYY-MM-DD HH:mm:ss',
+    },
     col: { span: 6 },
   },
 ]
@@ -67,17 +79,6 @@ const columns: ColumnConfig[] = [
       default: (scope) => {
         const row = scope.row as Record<string, unknown>
         return h('div', { class: 'row-operation' }, [
-          h(
-            ElButton,
-            {
-              type: 'primary',
-              link: true,
-              size: 'small',
-              icon: Search,
-              onClick: () => handleView(row),
-            },
-            () => '查看',
-          ),
           h(
             ElButton,
             {
@@ -135,9 +136,9 @@ function handleSearch() {
 
     tableData.value = records
       .sort((a, b) => (a.power ?? 0) - (b.power ?? 0))
-      .map((item, index) => ({
+      .map((item) => ({
         ...item,
-        sort: index + 1,
+        sort: item.power,
         status: item.deleted === 0 ? '正常' : '删除',
       }))
     total.value = data?.total ?? 0
