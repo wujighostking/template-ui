@@ -43,14 +43,14 @@ const formItems: FormItemConfig[] = [
 ]
 
 const columns: ColumnConfig[] = [
-  { prop: 'menuName', label: '菜单名称', minWidth: 180, align: 'center' },
+  { prop: 'menuName', label: '菜单名称', align: 'center' },
   { prop: 'icon', label: '图标', align: 'center' },
-  { prop: 'sort', label: '排序', width: 80, align: 'center' },
-  { prop: 'permission', label: '权限标识', minWidth: 180, align: 'center' },
-  { prop: 'componentPath', label: '组件路径', align: 'center' },
-  { prop: 'componentName', label: '组件名称', align: 'center' },
-  { prop: 'status', label: '状态', width: 80, align: 'center' },
-  { prop: 'createTime', label: '创建时间', width: 180, align: 'center' },
+  { prop: 'sort', label: '排序', align: 'center' },
+  { prop: 'permission', label: '权限标识', align: 'center' },
+  { prop: 'path', label: '组件路径', align: 'center' },
+  { prop: 'name', label: '组件名称', align: 'center' },
+  { prop: '_status', label: '状态', align: 'center' },
+  { prop: 'createTime', label: '创建时间', align: 'center' },
   {
     prop: 'operation',
     label: '操作',
@@ -58,7 +58,7 @@ const columns: ColumnConfig[] = [
     width: 280,
     slots: {
       default: (scope) => {
-        const row = scope.row as Record<string, unknown>
+        const row = scope.row as MenuNode
         return h('div', { class: 'row-operation' }, [
           h(
             ElButton,
@@ -66,10 +66,10 @@ const columns: ColumnConfig[] = [
               type: 'primary',
               link: true,
               size: 'small',
-              icon: Search,
-              onClick: () => handleView(row),
+              icon: Edit,
+              onClick: () => handleAdd(row),
             },
-            () => '查看',
+            () => '新增',
           ),
           h(
             ElButton,
@@ -113,7 +113,11 @@ function handleSearch() {
      * - parentId 不为 null 时为对应 id 节点的子菜单
      * 通过 buildTree 转换为 el-table 所需的 children 树形结构
      */
-    tableData.value = buildTree<MenuNode>(res.data ?? [])
+    const data = (res.data ?? []).map((item: any) => ({
+      ...item,
+      _status: item.status === 0 ? '启用' : '禁用',
+    }))
+    tableData.value = buildTree<MenuNode>(data)
   })
 }
 
@@ -121,22 +125,16 @@ function handleReset() {
   //  重置逻辑
 }
 
-function handleAdd() {
-  menuDialogRef.value?.open('add')
+function handleAdd(row?: MenuNode) {
+  menuDialogRef.value?.open('add', row)
 }
 
 function handleAdjustSort() {
   // 调整排序逻辑
 }
 
-/** 行内操作：查看 */
-function handleView(row: Record<string, unknown>) {
-  // 查看指定行菜单
-  console.log('查看', row)
-}
-
 /** 行内操作：编辑 */
-function handleEditRow(row: Record<string, unknown>) {
+function handleEditRow(row: MenuNode) {
   menuDialogRef.value?.open('edit', row)
 }
 
@@ -176,7 +174,7 @@ onBeforeMount(() => {
       <div class="menu-page__toolbar">
         <el-button type="primary" plain :icon="Search" @click="handleSearch">查询</el-button>
         <el-button type="default" plain :icon="Refresh" @click="handleReset">重置</el-button>
-        <el-button type="primary" :icon="Plus" @click="handleAdd">新增</el-button>
+        <el-button type="primary" :icon="Plus" @click="handleAdd()">新增</el-button>
         <el-button plain :icon="Sort" @click="handleAdjustSort">调整排序</el-button>
       </div>
 

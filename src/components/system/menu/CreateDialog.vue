@@ -13,22 +13,16 @@ import { computed, h, watch, reactive, ref, shallowRef } from 'vue'
 import { createMenu, getTopMenu, updateMenu } from '@/api/menu.ts'
 import { CODE } from '@/common/code.ts'
 import FormBuilder, { type FormItemConfig } from '@/components/FormBuilder.vue'
-import type { MenuDTO } from '@/schema/menu.ts'
+import type { MenuDTO, MenuNode } from '@/schema/menu.ts'
 
 const emit = defineEmits<{
   (e: 'handleSearch'): void
 }>()
 
-/** 父菜单下拉选项（实际项目可从接口拉取，这里以静态数据演示） */
-const parentMenuOptions = shallowRef([
-  // { value: 1, label: '系统管理' },
-
-])
-
 /** 状态下拉/单选选项：1-启用 0-禁用 */
 const statusOptions = [
-  { value: 1, label: '启用' },
-  { value: 0, label: '禁用' },
+  { value: 0, label: '启用' },
+  { value: 1, label: '禁用' },
 ]
 
 /** 表单默认值 */
@@ -38,11 +32,11 @@ function createDefaultForm(): MenuDTO {
     icon: '',
     sort: 1,
     permission: '',
-    componentPath: '',
-    componentName: '',
-    componentUrl: '',
-    routerMeta: '',
-    status: 1,
+    path: '',
+    name: '',
+    url: '',
+    meta: {},
+    status: 0,
     parentId: undefined,
   }
 }
@@ -52,8 +46,8 @@ const formData = reactive<MenuDTO>(createDefaultForm())
 /** 表单校验规则 */
 const formRules = {
   menuName: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
-  componentName: [{ required: true, message: '请输入组件名称', trigger: 'blur' }],
-  // componentPath: [{ required: true, message: '请输入组件路径', trigger: 'blur' }],
+  // name: [{ required: true, message: '请输入组件名称', trigger: 'blur' }],
+  path: [{ required: true, message: '请输入组件路径', trigger: 'blur' }],
   status: [{ required: true, message: '请选择状态', trigger: 'change' }],
 }
 
@@ -67,14 +61,14 @@ const formItems: FormItemConfig[] = [
     col: { span: 12 },
   },
   {
-    model: 'componentName',
+    model: 'name',
     label: '组件名称',
     type: ElInput,
     props: { placeholder: '如 User', clearable: true },
     col: { span: 12 },
   },
   {
-    model: 'componentPath',
+    model: 'path',
     label: '组件路径',
     type: ElInput,
     props: { placeholder: '如 system/user/index，不填则是菜单', clearable: true },
@@ -113,32 +107,15 @@ const formItems: FormItemConfig[] = [
     props: { placeholder: '如 system:user:list', clearable: true, maxlength: 100 },
     col: { span: 12 },
   },
+  // {
+  //   model: 'url',
+  //   label: '组件URL',
+  //   type: ElInput,
+  //   props: { placeholder: '如 /system/user', clearable: true },
+  //   col: { span: 12 },
+  // },
   {
-    model: 'parentId',
-    label: '父菜单ID',
-    type: ElSelect,
-    props: {
-      placeholder: '请选择父菜单（不选则为顶级菜单）',
-      clearable: true,
-      style: 'width: 100%',
-    },
-    col: { span: 12 },
-    slots: {
-      default: () =>
-        parentMenuOptions.value.map((item: { value: string; label: string }) =>
-          h(ElOption, { key: item.value, value: item.value, label: item.label }),
-        ),
-    },
-  },
-  {
-    model: 'componentUrl',
-    label: '组件URL',
-    type: ElInput,
-    props: { placeholder: '如 /system/user', clearable: true },
-    col: { span: 12 },
-  },
-  {
-    model: 'routerMeta',
+    model: 'meta',
     label: '路由元信息',
     type: ElInput,
     props: {
@@ -157,14 +134,21 @@ const dialogMode = ref<'add' | 'edit'>('add')
 const dialogTitle = computed(() => (dialogMode.value === 'add' ? '新增菜单' : '编辑菜单'))
 
 /** 打开弹窗：mode 用于切换标题与提交语义，data 用于回显 */
-function open(mode: 'add' | 'edit', data?: Partial<MenuDTO>) {
+function open(mode: 'add' | 'edit', data?: MenuNode) {
   dialogMode.value = mode
-  Object.assign(formData, createDefaultForm(), data ?? {})
-  formData.routerMeta = JSON.stringify(formData.routerMeta, null, 2)
+  if (mode === 'edit') {
+    Object.assign(formData, createDefaultForm(), data ?? {})
+  } else if (mode === 'add') {
+    formData.parentId = data?.id
+  }
+
+  formData.meta = JSON.stringify(formData.meta, null, 2)
   dialogVisible.value = true
 }
 
 function close() {
+  Object.assign(formData, createDefaultForm())
+
   dialogVisible.value = false
 }
 
@@ -194,17 +178,6 @@ async function handleSubmit() {
     // 校验失败，Element Plus 会自动展示错误信息
   }
 }
-
-watch(dialogVisible, () => {
-  if (!dialogVisible.value) return
-
-  getTopMenu().then((res) => {
-    parentMenuOptions.value = res.data.map((item: { id: string; menuName: string }) => ({
-      value: item.id,
-      label: item.menuName,
-    }))
-  })
-})
 
 defineExpose({ open, close })
 </script>

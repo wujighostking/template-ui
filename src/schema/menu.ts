@@ -4,10 +4,10 @@ export interface MenuDTO {
   icon: string
   sort: number
   permission: string
-  componentPath: string
-  componentName: string
-  componentUrl: string
-  routerMeta: string
+  path: string
+  name: string
+  url: string
+  meta: string | object
   status: number
   /** 父菜单 ID：null / undefined 表示顶级菜单 */
   parentId: string | null | undefined
