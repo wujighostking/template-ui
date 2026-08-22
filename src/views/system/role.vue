@@ -1,11 +1,21 @@
 <script setup lang="ts">
 import { Delete, Edit, Plus, Refresh, Search } from '@element-plus/icons-vue'
-import { ElButton, ElDatePicker, ElInput, ElOption, ElSelect } from 'element-plus'
-import { h, onBeforeMount, reactive, ref, shallowRef } from 'vue'
+import {
+  ElButton,
+  ElDatePicker,
+  ElInput,
+  ElMessage,
+  ElMessageBox,
+  ElOption,
+  ElSelect,
+} from 'element-plus'
+import { h, onBeforeMount, reactive, ref, shallowRef, useTemplateRef } from 'vue'
 
-import { getRolePage } from '@/api/role.ts'
+import { deleteRoleById, getRolePage } from '@/api/role.ts'
+import { CODE } from '@/common/code.ts'
 import type { FormItemConfig } from '@/components/FormBuilder.vue'
 import FormBuilder from '@/components/FormBuilder.vue'
+import CreateDialog from '@/components/system/role/CreateDialog.vue'
 import TableBuilder, { type ColumnConfig, type PageQuery } from '@/components/TableBuilder.vue'
 import type { Role } from '@/schema/role.ts'
 
@@ -69,6 +79,7 @@ const columns: ColumnConfig[] = [
   { prop: 'roleCode', label: '角色代码', align: 'center' },
   { prop: 'sort', label: '排序', align: 'center' },
   { prop: 'status', label: '状态', align: 'center' },
+  { prop: 'description', label: '角色描述', align: 'center' },
   { prop: 'createTime', label: '创建时间', align: 'center' },
   {
     prop: 'operation',
@@ -169,8 +180,11 @@ function handleCurrentChange(query: PageQuery) {
   handleSearch()
 }
 
+/** 新增角色弹窗引用 */
+const roleDialogRef = useTemplateRef<InstanceType<typeof CreateDialog>>('roleDialogRef')
+
 function handleAdd() {
-  // 新增角色逻辑
+  roleDialogRef.value?.open('add')
 }
 
 function handleAssignUser() {
@@ -181,22 +195,39 @@ function handleRefresh() {
   // 刷新逻辑
 }
 
-/** 行内操作：查看 */
-function handleView(row: Record<string, unknown>) {
-  // 查看指定行角色
-  console.log('查看', row)
-}
-
 /** 行内操作：编辑 */
 function handleEditRow(row: Record<string, unknown>) {
-  // 编辑指定行角色
-  console.log('编辑', row)
+  // 打开编辑弹窗并回显当前行数据
+  roleDialogRef.value?.open('edit', {
+    id: row.id as string,
+    roleName: row.roleName as string,
+    roleCode: row.roleCode as string,
+    description: row.description as string,
+    power: row.power as number,
+  })
 }
 
-/** 行内操作：删除 */
+/** 行内操作：删除（带二次确认） */
 function handleDeleteRow(row: Record<string, unknown>) {
-  // 删除指定行角色
-  console.log('删除', row)
+  const id = row.id as string
+  const roleName = (row.roleName as string) ?? ''
+
+  ElMessageBox.confirm(`确定要删除角色「${roleName}」吗？删除后将无法恢复。`, '删除确认', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  })
+    .then(() => {
+      deleteRoleById(id).then((res) => {
+        if (res.code === CODE.SUCCESS) {
+          ElMessage.success(res.message || '删除成功')
+          handleSearch()
+        }
+      })
+    })
+    .catch(() => {
+      // 用户取消删除，无需处理
+    })
 }
 
 onBeforeMount(() => {
@@ -240,6 +271,8 @@ onBeforeMount(() => {
       />
     </el-card>
   </div>
+
+  <CreateDialog ref="roleDialogRef" @handle-search="handleSearch" />
 </template>
 
 <style scoped lang="scss">
