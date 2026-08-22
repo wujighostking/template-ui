@@ -18,7 +18,7 @@ export interface UserDTO {
   /** 头像 URL */
   avatar?: string
   /** 账号状态：0 禁用，1 启用 */
-  status?: number
+  status?: string
   /** 创建时间，格式：yyyy-MM-dd HH:mm:ss */
   createTime?: string
   /** 更新时间，格式：yyyy-MM-dd HH:mm:ss */
@@ -53,7 +53,7 @@ export interface User {
   /** 头像 URL */
   avatar?: string
   /** 账号状态：0 禁用，1 启用 */
-  status?: number
+  status?: string
   /** 允许后端扩展其它未知字段 */
   [key: string]: unknown
 }

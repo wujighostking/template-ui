@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Delete, Edit, Plus, Refresh, Search } from '@element-plus/icons-vue'
-import { ElButton, ElDatePicker, ElInput, ElMessageBox, ElMessage, ElSelect } from 'element-plus'
+import { ElButton, ElDatePicker, ElInput, ElMessageBox, ElMessage } from 'element-plus'
 import { h, onBeforeMount, reactive, ref, shallowRef, useTemplateRef } from 'vue'
 
 import { deleteUserById, getUserPage } from '@/api/user.ts'
@@ -49,7 +49,13 @@ const formItems: FormItemConfig[] = [
     model: 'createTime',
     label: '创建时间',
     type: ElDatePicker,
-    props: { placeholder: '请输入创建时间', clearable: true, type: 'datetimerange' },
+    props: {
+      placeholder: '请输入创建时间',
+      clearable: true,
+      type: 'datetimerange',
+      format: 'YYYY-MM-DD HH:mm:ss',
+      valueFormat: 'YYYY-MM-DD HH:mm:ss',
+    },
     col: { span: 6 },
   },
 ]
@@ -58,6 +64,7 @@ const columns: ColumnConfig[] = [
   { prop: 'username', label: '用户名', align: 'center' },
   { prop: 'nickname', label: '昵称', align: 'center' },
   { prop: 'phoneNumber', label: '手机号', align: 'center' },
+  { prop: 'status', label: '状态', align: 'center' },
   { prop: 'createTime', label: '创建时间', align: 'center' },
   {
     prop: 'operation',
@@ -119,7 +126,10 @@ function handleSearch() {
 
   getUserPage(params).then((res) => {
     const data = res.data as { records?: UserDTO[]; total?: number }
-    tableData.value = data?.records ?? []
+    tableData.value = (data?.records ?? []).map((item) => ({
+      ...item,
+      status: item.deleted === 0 ? '正常' : '禁用',
+    }))
     total.value = data?.total ?? 0
   })
 }
