@@ -38,4 +38,18 @@ export function deleteUserById(id: string) {
   return request({ url: '/user/delete', method: 'DELETE', params: { id } })
 }
 
+/**
+ * 查询用户已分配的角色
+ */
+export function getUserRoles(userId: string) {
+  return request({ url: '/user/role', method: 'GET', params: { userId } })
+}
+
+/**
+ * 分配角色（全量覆盖：传空数组即清空用户所有角色）
+ */
+export function assignUserRole(userId: string, roleIds: string[]) {
+  return request({ url: '/user-role/bind', method: 'POST', data: { userId, roleIds } })
+}
+
 export type { User, UserDTO, UserQuery }

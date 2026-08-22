@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Delete, Edit, Plus, Refresh, Search } from '@element-plus/icons-vue'
+import { Delete, Edit, Plus, Refresh, Search, UserFilled } from '@element-plus/icons-vue'
 import { ElButton, ElDatePicker, ElInput, ElMessageBox, ElMessage } from 'element-plus'
 import { h, onBeforeMount, reactive, ref, shallowRef, useTemplateRef } from 'vue'
 
@@ -7,6 +7,7 @@ import { deleteUserById, getUserPage } from '@/api/user.ts'
 import { CODE } from '@/common/code.ts'
 import type { FormItemConfig } from '@/components/FormBuilder.vue'
 import FormBuilder from '@/components/FormBuilder.vue'
+import AssignRoleDialog from '@/components/system/user/AssignRoleDialog.vue'
 import CreateDialog from '@/components/system/user/CreateDialog.vue'
 import TableBuilder, { type ColumnConfig, type PageQuery } from '@/components/TableBuilder.vue'
 import type { UserDTO } from '@/schema/user.ts'
@@ -70,7 +71,7 @@ const columns: ColumnConfig[] = [
     prop: 'operation',
     label: '操作',
     align: 'center',
-    width: 280,
+    width: 380,
     slots: {
       default: (scope) => {
         const row = scope.row as UserDTO
@@ -85,6 +86,17 @@ const columns: ColumnConfig[] = [
               onClick: () => handleEditRow(row),
             },
             () => '编辑',
+          ),
+          h(
+            ElButton,
+            {
+              type: 'warning',
+              link: true,
+              size: 'small',
+              icon: UserFilled,
+              onClick: () => handleAssignRole(row),
+            },
+            () => '分配角色',
           ),
           h(
             ElButton,
@@ -149,8 +161,17 @@ function handleReset() {
 /** 新增/编辑用户弹窗引用 */
 const userDialogRef = useTemplateRef<InstanceType<typeof CreateDialog>>('userDialogRef')
 
+/** 分配角色弹窗引用 */
+const assignRoleDialogRef =
+  useTemplateRef<InstanceType<typeof AssignRoleDialog>>('assignRoleDialogRef')
+
 function handleAdd() {
   userDialogRef.value?.open('add')
+}
+
+/** 行内操作：分配角色 */
+function handleAssignRole(row: UserDTO) {
+  assignRoleDialogRef.value?.open(row)
 }
 
 /** 分页：切换每页条数时回到第一页重新查询 */
@@ -258,6 +279,7 @@ onBeforeMount(() => {
     </el-card>
 
     <CreateDialog ref="userDialogRef" @handle-search="handleSearch" />
+    <AssignRoleDialog ref="assignRoleDialogRef" @handle-search="handleSearch" />
   </div>
 </template>
 
