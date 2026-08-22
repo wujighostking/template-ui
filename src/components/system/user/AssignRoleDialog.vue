@@ -3,7 +3,7 @@ import { ElMessage } from 'element-plus'
 import { computed, nextTick, ref, shallowRef, useTemplateRef } from 'vue'
 
 import { getRolePage } from '@/api/role.ts'
-import { assignUserRole, getUserRoles } from '@/api/user.ts'
+import { assignUserRole, getRoleIdByUserId, getUserRoles } from '@/api/user.ts'
 import { CODE } from '@/common/code.ts'
 import TableBuilder, { type ColumnConfig } from '@/components/TableBuilder.vue'
 import type { Role } from '@/schema/role.ts'
@@ -12,6 +12,8 @@ import type { UserDTO } from '@/schema/user.ts'
 const emit = defineEmits<{
   (e: 'handleSearch'): void
 }>()
+
+const roleTableRef = useTemplateRef('roleTable')
 
 /** 全部可选角色（表格数据源） */
 const roleList = shallowRef<Role[]>([])
@@ -47,6 +49,16 @@ async function open(user: UserDTO) {
     await getRolePage({ pageNum: 1, pageSize: 1000 }).then((res) => {
       if (res.code === CODE.SUCCESS) {
         roleList.value = res.data.records
+      }
+    })
+
+    await getRoleIdByUserId(currentUser.value.id).then((res) => {
+      if (res.code === CODE.SUCCESS) {
+        roleList.value.forEach((role) => {
+          if (res?.data?.includes(role.id)) {
+            roleTableRef.value?.getTableInstance()?.toggleRowSelection?.(role, true)
+          }
+        })
       }
     })
   } finally {
@@ -91,6 +103,7 @@ defineExpose({ open, close })
     append-to-body
   >
     <TableBuilder
+      ref="roleTable"
       :columns="columns"
       :data="roleList"
       :has-pagination="false"

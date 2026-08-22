@@ -52,4 +52,8 @@ export function assignUserRole(userId: string, roleIds: string[]) {
   return request({ url: '/user-role/bind', method: 'POST', data: { userId, roleIds } })
 }
 
+export function getRoleIdByUserId(userId: string) {
+  return request({ url: '/user-role/get-role-id', method: 'GET', params: { userId } })
+}
+
 export type { User, UserDTO, UserQuery }

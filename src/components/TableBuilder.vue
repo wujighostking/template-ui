@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { VNode } from 'vue'
+import { useTemplateRef, type VNode } from 'vue'
 import { computed, reactive, watch } from 'vue'
 
 export interface ColumnConfig {
@@ -98,6 +98,11 @@ function handleCurrentChange(current: number) {
 
 /** 是否启用树形表格：treeProps 中指定了 children 字段即可 */
 const hasTree = computed(() => Boolean(props.treeProps && props.treeProps.children))
+
+const tableInstanceRef = useTemplateRef('tableInstance')
+defineExpose({
+  getTableInstance: () => tableInstanceRef.value,
+})
 </script>
 
 <template>
@@ -108,6 +113,7 @@ const hasTree = computed(() => Boolean(props.treeProps && props.treeProps.childr
         style="width: 100%"
         :tree-props="hasTree ? props.treeProps : undefined"
         :default-expand-all="hasTree ? props.defaultExpandAll : undefined"
+        ref="tableInstance"
         v-bind="$attrs"
       >
         <el-table-column

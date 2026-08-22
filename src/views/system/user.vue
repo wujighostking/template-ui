@@ -65,6 +65,7 @@ const columns: ColumnConfig[] = [
   { prop: 'username', label: '用户名', align: 'center' },
   { prop: 'nickname', label: '昵称', align: 'center' },
   { prop: 'phoneNumber', label: '手机号', align: 'center' },
+  { prop: 'role', label: '角色', align: 'center' },
   { prop: 'status', label: '状态', align: 'center' },
   { prop: 'createTime', label: '创建时间', align: 'center' },
   {
