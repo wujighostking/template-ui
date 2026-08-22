@@ -10,7 +10,7 @@ const routes = import.meta.glob('@/views/**/*.vue')
  */
 export interface MenuTreeNode extends MenuItem {
   /** 节点唯一标识 */
-  id: string | number
+  id: string
   /** 父节点 id，null / undefined 表示顶级节点 */
   parentId: string | number | null
   /** 子节点 */
@@ -32,9 +32,14 @@ export interface MenuTreeNode extends MenuItem {
  */
 export function buildMenuTree(list: MenuTreeNode[]): MenuItem[] {
   list = list.map((item) => {
-    if (item.componentPath.startsWith('views')) {
-      item.componentPath = item.componentPath.replace('views', '')
+    if (item.path.startsWith('views')) {
+      item.path = item.path.replace('views', '')
     }
+
+    if (item.path.endsWith('.vue')) {
+      item.path = item.path.replace('.vue', '')
+    }
+
     return item
   })
   return buildTree<MenuTreeNode>(list) as MenuItem[]

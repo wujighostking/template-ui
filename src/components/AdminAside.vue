@@ -31,42 +31,18 @@ const route = useRoute()
 const activeMenu = computed(() => route.path)
 
 const menus = shallowRef<MenuItem[]>([
-  {
-    componentPath: '/workspace',
-    menuName: '工作台',
-    icon: 'Odometer',
-  },
-  {
-    componentPath: '/system',
-    menuName: '系统管理',
-    icon: 'Setting',
-    children: [
-      { componentPath: '/system/user', menuName: '用户管理', icon: 'User' },
-      { componentPath: '/system/role', menuName: '角色管理', icon: 'Key' },
-      { componentPath: '/system/menu', menuName: '菜单管理', icon: 'MenuIcon' },
-      { componentPath: '/system/dict', menuName: '字典管理', icon: 'Notebook' },
-    ],
-  },
-  {
-    componentPath: '/monitor',
-    menuName: '系统监控',
-    icon: 'Monitor',
-    children: [
-      { componentPath: '/monitor/online', menuName: '在线用户', icon: 'BellFilled' },
-      { componentPath: '/monitor/job', menuName: '定时任务', icon: 'Timer' },
-      { componentPath: '/monitor/data', menuName: '数据监控', icon: 'DataLine' },
-    ],
-  },
-  {
-    componentPath: '/tool',
-    menuName: '系统工具',
-    icon: 'Tools',
-    children: [
-      { componentPath: '/tool/build', menuName: '表单构建', icon: 'DocumentCopy' },
-      { componentPath: '/tool/gen', menuName: '代码生成', icon: 'EditPen' },
-      { componentPath: '/tool/swagger', menuName: '系统接口', icon: 'Connection' },
-    ],
-  },
+  // {
+  //   path: '/system',
+  //   menuName: '系统管理',
+  //   icon: 'Setting',
+  //   children: [
+  //     { path: '/system/user', menuName: '用户管理', icon: 'User' },
+  //     { path: '/system/role', menuName: '角色管理', icon: 'Key' },
+  //     { path: '/system/menu', menuName: '菜单管理', icon: 'MenuIcon' },
+  //     { path: '/system/dict', menuName: '字典管理', icon: 'Notebook' },
+  //   ],
+  // },
+
 ])
 
 const icons: Record<string, Component> = {
@@ -93,11 +69,11 @@ function handleMenuSelect(index: string) {
 }
 
 onBeforeMount(() => {
-  // getMenu().then((res) => {
-  //   if (res.code === CODE.SUCCESS) {
-  //     menus.value = buildMenuTree(res.data ?? [])
-  //   }
-  // })
+  getMenu().then((res) => {
+    if (res.code === CODE.SUCCESS) {
+      menus.value = buildMenuTree(res.data ?? [])
+    }
+  })
 })
 </script>
 
@@ -111,27 +87,24 @@ onBeforeMount(() => {
       active-text-color="#3b82f6"
       @select="handleMenuSelect"
     >
-      <template v-for="item in menus" :key="item.componentPath">
-        <el-sub-menu v-if="item.children?.length" :index="item.componentPath">
+      <template v-for="item in menus" :key="item.id">
+        <el-sub-menu v-if="item.children?.length" :index="item.path">
           <template #title>
-            <el-icon>
+            <el-icon v-if="item.icon">
               <component :is="icons[item.icon]" />
             </el-icon>
             <span>{{ item.menuName }}</span>
           </template>
-          <el-menu-item
-            v-for="child in item.children"
-            :key="child.componentPath"
-            :index="child.componentPath"
-          >
-            <el-icon>
+          <el-menu-item v-for="child in item.children" :key="child.id" :index="child.path">
+            <el-icon v-if="child.icon">
               <component :is="icons[child.icon]" />
             </el-icon>
             <span>{{ child.menuName }}</span>
           </el-menu-item>
         </el-sub-menu>
-        <el-menu-item v-else :index="item.componentPath">
-          <el-icon>
+
+        <el-menu-item v-else :index="item.path">
+          <el-icon v-if="item.icon">
             <component :is="icons[item.icon]" />
           </el-icon>
           <span>{{ item.menuName }}</span>
