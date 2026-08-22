@@ -1,17 +1,26 @@
 <script setup lang="ts">
 import { Delete, Edit, Plus, Refresh, Search } from '@element-plus/icons-vue'
-import { ElButton, ElDatePicker, ElInput, ElSelect } from 'element-plus'
-import { h, reactive } from 'vue'
+import { ElButton, ElDatePicker, ElInput, ElMessageBox, ElMessage, ElSelect } from 'element-plus'
+import { h, onBeforeMount, reactive, ref, shallowRef, useTemplateRef } from 'vue'
 
+import { deleteUserById, getUserPage } from '@/api/user.ts'
+import { CODE } from '@/common/code.ts'
 import type { FormItemConfig } from '@/components/FormBuilder.vue'
 import FormBuilder from '@/components/FormBuilder.vue'
-import TableBuilder, { type ColumnConfig } from '@/components/TableBuilder.vue'
+import CreateDialog from '@/components/system/user/CreateDialog.vue'
+import TableBuilder, { type ColumnConfig, type PageQuery } from '@/components/TableBuilder.vue'
+import type { UserDTO } from '@/schema/user.ts'
 
-const searchForm = reactive<Record<string, unknown>>({
-  username: '',
-  nickname: '',
-  dept: '',
-  phone: '',
+const searchForm = reactive<{
+  username?: string
+  nickname?: string
+  phoneNumber?: string
+  createTime?: string[]
+}>({
+  username: undefined,
+  nickname: undefined,
+  phoneNumber: undefined,
+  createTime: [],
 })
 
 const formItems: FormItemConfig[] = [
@@ -30,14 +39,7 @@ const formItems: FormItemConfig[] = [
     col: { span: 6 },
   },
   {
-    model: 'dept',
-    label: '部门',
-    type: ElSelect,
-    props: { placeholder: '请输入部门', clearable: true },
-    col: { span: 6 },
-  },
-  {
-    model: 'phone',
+    model: 'phoneNumber',
     label: '手机号',
     type: ElInput,
     props: { placeholder: '请输入手机号', clearable: true },
@@ -48,14 +50,14 @@ const formItems: FormItemConfig[] = [
     label: '创建时间',
     type: ElDatePicker,
     props: { placeholder: '请输入创建时间', clearable: true, type: 'datetimerange' },
-    col: { span: 6, style: { marginTop: '8px' } },
+    col: { span: 6 },
   },
 ]
 
 const columns: ColumnConfig[] = [
   { prop: 'username', label: '用户名', align: 'center' },
   { prop: 'nickname', label: '昵称', align: 'center' },
-  { prop: 'phone', label: '手机号', align: 'center' },
+  { prop: 'phoneNumber', label: '手机号', align: 'center' },
   { prop: 'createTime', label: '创建时间', align: 'center' },
   {
     prop: 'operation',
@@ -64,19 +66,8 @@ const columns: ColumnConfig[] = [
     width: 280,
     slots: {
       default: (scope) => {
-        const row = scope.row as Record<string, unknown>
+        const row = scope.row as UserDTO
         return h('div', { class: 'row-operation' }, [
-          h(
-            ElButton,
-            {
-              type: 'primary',
-              link: true,
-              size: 'small',
-              icon: Search,
-              onClick: () => handleView(row),
-            },
-            () => '查看',
-          ),
           h(
             ElButton,
             {
@@ -105,58 +96,101 @@ const columns: ColumnConfig[] = [
   },
 ]
 
-const tableData: Record<string, unknown>[] = [
-  {
-    username: 'admin',
-    nickname: '超级管理员',
-    dept: '研发部',
-    phone: '15888888888',
-    createTime: '2024-01-01 09:00',
-  },
-  {
-    username: 'zhangsan',
-    nickname: '张三',
-    dept: '研发部',
-    phone: '13800138001',
-    createTime: '2024-05-11 14:30',
-  },
-  {
-    username: 'lisi',
-    nickname: '李四',
-    dept: '产品部',
-    phone: '13800138002',
-    createTime: '2024-05-15 09:15',
-  },
-]
+const tableData = shallowRef<UserDTO[]>([])
+
+/** 分页总条数，查询后同步给 TableBuilder 展示 */
+const total = ref(0)
+
+/** 分页查询参数 */
+const pageQuery = reactive({
+  current: 1,
+  size: 10,
+})
 
 function handleSearch() {
-  // 查询逻辑
+  const params = {
+    pageNum: pageQuery.current,
+    pageSize: pageQuery.size,
+    username: searchForm.username?.trim() || undefined,
+    nickname: searchForm.nickname?.trim() || undefined,
+    phoneNumber: searchForm.phoneNumber?.trim() || undefined,
+    createTime: searchForm.createTime?.length ? searchForm.createTime : undefined,
+  }
+
+  getUserPage(params).then((res) => {
+    const data = res.data as { records?: UserDTO[]; total?: number }
+    tableData.value = data?.records ?? []
+    total.value = data?.total ?? 0
+  })
 }
 
 function handleReset() {
-  //  重置逻辑
+  Object.assign(searchForm, {
+    username: undefined,
+    nickname: undefined,
+    dept: undefined,
+    phoneNumber: undefined,
+    createTime: [],
+  })
+  pageQuery.current = 1
+  handleSearch()
 }
+
+/** 新增/编辑用户弹窗引用 */
+const userDialogRef = useTemplateRef<InstanceType<typeof CreateDialog>>('userDialogRef')
 
 function handleAdd() {
-  // 新增用户逻辑
+  userDialogRef.value?.open('add')
 }
 
-/** 行内操作：查看 */
-function handleView(row: Record<string, unknown>) {
-  // 查看指定行用户
-  console.log('查看', row)
+/** 分页：切换每页条数时回到第一页重新查询 */
+function handleSizeChange(query: PageQuery) {
+  pageQuery.size = query.size
+  pageQuery.current = 1
+  handleSearch()
+}
+
+/** 分页：切换页码时重新查询 */
+function handleCurrentChange(query: PageQuery) {
+  pageQuery.current = query.current
+  handleSearch()
 }
 
 /** 行内操作：编辑 */
-function handleEditRow(row: Record<string, unknown>) {
-  // 编辑指定行用户
-  console.log('编辑', row)
+function handleEditRow(row: UserDTO) {
+  userDialogRef.value?.open('edit', {
+    id: row.id,
+    username: row.username,
+    nickname: row.nickname,
+    phoneNumber: row.phoneNumber,
+    email: row.email,
+    dept: row.dept,
+    gender: row.gender,
+    status: row.status,
+  })
 }
 
-/** 行内操作：删除 */
-function handleDeleteRow(row: Record<string, unknown>) {
-  // 删除指定行用户
-  console.log('删除', row)
+/** 行内操作：删除（二次确认） */
+async function handleDeleteRow(row: UserDTO) {
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除用户「${row.username}」吗？删除后不可恢复。`,
+      '删除确认',
+      {
+        type: 'warning',
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+      },
+    )
+
+    const { code, message } = await deleteUserById(row.id)
+    if (code === CODE.SUCCESS) {
+      ElMessage.success(message ?? '删除成功')
+      handleSearch()
+    }
+  } catch {
+    // 用户取消删除或请求异常，静默处理（错误提示由响应拦截器统一兜底）
+  }
 }
 
 function handleImport() {
@@ -170,6 +204,10 @@ function handleExport() {
 function handleRefresh() {
   // 刷新逻辑
 }
+
+onBeforeMount(() => {
+  handleSearch()
+})
 </script>
 
 <template>
@@ -199,8 +237,17 @@ function handleRefresh() {
         <el-button :icon="Refresh" @click="handleRefresh">刷新</el-button>
       </div>
 
-      <TableBuilder :columns="columns" :data="tableData" row-key="id" />
+      <TableBuilder
+        :columns="columns"
+        :data="tableData"
+        :total="total"
+        row-key="id"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
     </el-card>
+
+    <CreateDialog ref="userDialogRef" @handle-search="handleSearch" />
   </div>
 </template>
 
