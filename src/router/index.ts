@@ -1,65 +1,59 @@
 import { ElMessage } from 'element-plus'
-import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 
 import { checkToken } from '@/api/login/checkToken.ts'
+import { CODE } from '@/common/code.ts'
 import { whiteList } from '@/common/constants'
+import { addRoutes } from '@/router/routesHandler.ts'
 import { isEmpty } from '@/utils'
 import { getToken, removeStorage } from '@/utils/storage'
 
-const routes: RouteRecordRaw[] = [
-  {
-    path: '/',
-    redirect: '/workspace',
-    // component: () => import('@/views/index.vue'),
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: () => import('@/views/login.vue'),
-  },
-]
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   // routes: routes,
   routes: [
-    ...routes,
     {
-      path: '/workspace',
-      component: () => import('@/views/index.vue'),
-      children: [
-        {
-          name: 'workspace',
-          path: '/workspace',
-          component: () => import('@/views/workspace.vue'),
-        },
-      ],
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/login.vue'),
     },
-    {
-      path: '/system',
-      component: () => import('@/views/index.vue'),
-      children: [
-        {
-          name: 'user',
-          path: '/system/user',
-          component: () => import('@/views/system/user.vue'),
-        },
-        {
-          name: 'role',
-          path: '/system/role',
-          component: () => import('@/views/system/role.vue'),
-        },
-        {
-          name: 'menu',
-          path: '/system/menu',
-          component: () => import('@/views/system/menu.vue'),
-        },
-        {
-          name: 'dict',
-          path: '/system/dict',
-          component: () => import('@/views/system/dict.vue'),
-        },
-      ],
-    },
+    // {
+    //   path: '/workspace',
+    //   component: () => import('@/views/index.vue'),
+    //   children: [
+    //     {
+    //       name: 'workspace',
+    //       path: '/workspace',
+    //       component: () => import('@/views/workspace.vue'),
+    //     },
+    //   ],
+    // },
+    // {
+    //   path: '/system',
+    //   component: () => import('@/views/index.vue'),
+    //   children: [
+    //     {
+    //       name: 'user',
+    //       path: '/system/user',
+    //       component: () => import('@/views/system/user.vue'),
+    //     },
+    //     {
+    //       name: 'role',
+    //       path: '/system/role',
+    //       component: () => import('@/views/system/role.vue'),
+    //     },
+    //     {
+    //       name: 'menu',
+    //       path: '/system/menu',
+    //       component: () => import('@/views/system/menu.vue'),
+    //     },
+    //     {
+    //       name: 'dict',
+    //       path: '/system/dict',
+    //       component: () => import('@/views/system/dict.vue'),
+    //     },
+    //   ],
+    // },
   ],
 })
 
@@ -94,21 +88,21 @@ router.beforeEach(async (to) => {
   }
 
   // 动态路由只在首次进入时注册一次，避免每次导航都重复请求并注册
-  // try {
-  //   const res = await addRoutes()
-  //   if (res?.code !== CODE.SUCCESS) return { path: '/login' }
-  //
-  //   // 关键：注册完动态路由后必须返回导航目标以触发重新导航，
-  //   // 让路由表基于最新路由重新解析，否则本次导航仍沿用旧路由表的"无匹配"结果
-  //   if (isFirst) {
-  //     isFirst = false
-  //     return { ...to, replace: true }
-  //   }
-  //
-  //   return true
-  // } catch {
-  //   return { path: '/login' }
-  // }
+  try {
+    if (isFirst) {
+      isFirst = false
+      const res = await addRoutes()
+      if (res?.code !== CODE.SUCCESS) return { path: '/login' }
+
+      // 关键：注册完动态路由后必须返回导航目标以触发重新导航，
+      // 让路由表基于最新路由重新解析，否则本次导航仍沿用旧路由表的"无匹配"结果
+      return { ...to, replace: true }
+    }
+
+    return true
+  } catch {
+    return { path: '/login' }
+  }
 })
 
-export { router as default, routes }
+export { router as default }

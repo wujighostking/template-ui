@@ -7,7 +7,7 @@ export interface MenuDTO {
   path: string
   name: string
   url: string
-  meta: string | object
+  meta: Record<string, any>
   status: number
   /** 父菜单 ID：null / undefined 表示顶级菜单 */
   parentId: string | null | undefined

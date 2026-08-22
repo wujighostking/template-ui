@@ -6,7 +6,7 @@ export function createMenu(data: MenuDTO) {
 }
 
 export function getMenu() {
-  return request({ url: '/menu/list', method: 'GET' })
+  return request({ url: '/menu/list', method: 'GET' }, false)
 }
 
 export function getTopMenu() {

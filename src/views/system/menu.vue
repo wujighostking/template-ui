@@ -107,16 +107,17 @@ const menuDialogRef = useTemplateRef<InstanceType<typeof CreateDialog>>('menuDia
 function handleSearch() {
   // 查询逻辑
   getMenu().then((res) => {
-    /**
-     * 后端返回的是扁平数据，每个节点带有 parentId 字段：
-     * - parentId 为 null 时为顶级菜单
-     * - parentId 不为 null 时为对应 id 节点的子菜单
-     * 通过 buildTree 转换为 el-table 所需的 children 树形结构
-     */
+    //   /**
+    //    * 后端返回的是扁平数据，每个节点带有 parentId 字段：
+    //    * - parentId 为 null 时为顶级菜单
+    //    * - parentId 不为 null 时为对应 id 节点的子菜单
+    //    * 通过 buildTree 转换为 el-table 所需的 children 树形结构
+    //    */
     const data = (res.data ?? []).map((item: any) => ({
       ...item,
       _status: item.status === 0 ? '启用' : '禁用',
     }))
+
     tableData.value = buildTree<MenuNode>(data)
   })
 }

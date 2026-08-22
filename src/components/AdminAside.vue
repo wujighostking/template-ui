@@ -88,7 +88,7 @@ onBeforeMount(() => {
       @select="handleMenuSelect"
     >
       <template v-for="item in menus" :key="item.id">
-        <el-sub-menu v-if="item.children?.length" :index="item.path">
+        <el-sub-menu v-if="item.children?.length" :index="item.id">
           <template #title>
             <el-icon v-if="item.icon">
               <component :is="icons[item.icon]" />
@@ -103,7 +103,7 @@ onBeforeMount(() => {
           </el-menu-item>
         </el-sub-menu>
 
-        <el-menu-item v-else :index="item.path">
+        <el-menu-item v-else :index="item.id">
           <el-icon v-if="item.icon">
             <component :is="icons[item.icon]" />
           </el-icon>

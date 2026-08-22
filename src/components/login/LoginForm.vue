@@ -5,6 +5,7 @@ import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { login } from '@/api/login'
+import { addRoutes } from '@/router/routesHandler.ts'
 import type { LoginForm } from '@/schema/loginForm'
 import { setStorage } from '@/utils/storage'
 
@@ -40,23 +41,24 @@ function handleLogin() {
     loading.value = true
 
     login({ ...form })
-      .then(
-        (data) => {
-          if (data.code !== 0) return
+      .then((data) => {
+        if (data.code !== 0) return
 
-          setStorage('userInfo', JSON.stringify(data.data))
-          ElMessage.success(data.message || '登录成功')
+        setStorage('userInfo', JSON.stringify(data.data))
+        ElMessage.success(data.message || '登录成功')
 
-          router.replace('/')
-        },
-        (error) => {
-          if (__DEV__) {
-            console.error('登录失败', error)
-          }
+        return addRoutes()
+      })
+      .then(() => {
+        router.replace('/workspace')
+      })
+      .catch((error) => {
+        if (__DEV__) {
+          console.error('登录失败', error)
+        }
 
-          ElMessage.error('登录失败，请检查手机号码或密码')
-        },
-      )
+        ElMessage.error('登录失败，请检查手机号码或密码')
+      })
 
       .finally(() => {
         loading.value = false
