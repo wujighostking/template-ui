@@ -20,3 +20,7 @@ export function updateMenu(data: MenuDTO) {
 export function deleteMenu(ids: number[]) {
   return request({ url: `/menu/delete`, method: 'POST', data: ids })
 }
+
+export function getMenuIdsByRoleId(roleId: string) {
+  return request({ url: '/role-menu/list', method: 'GET', params: { roleId } })
+}

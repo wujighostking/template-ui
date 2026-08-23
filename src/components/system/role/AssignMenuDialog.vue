@@ -2,7 +2,7 @@
 import { ElMessage, ElTree, vLoading } from 'element-plus'
 import { nextTick, ref, shallowRef, useTemplateRef } from 'vue'
 
-import { getMenu } from '@/api/menu.ts'
+import { getMenu, getMenuIdsByRoleId } from '@/api/menu.ts'
 import { bindMenuToRole } from '@/api/role.ts'
 import { CODE } from '@/common/code.ts'
 import type { MenuNode } from '@/schema/menu.ts'
@@ -30,6 +30,10 @@ async function open(role: { id: string; roleName: string }) {
   try {
     const res = await getMenu()
     menuTree.value = buildTree(res.data ?? [])
+    await nextTick()
+
+    const { data: checkedKeys } = await getMenuIdsByRoleId(role.id)
+    treeRef.value?.setCheckedKeys(checkedKeys ?? [], false)
   } finally {
     loading.value = false
   }
