@@ -50,7 +50,7 @@ function handleLogin() {
         return addRoutes()
       })
       .then(() => {
-        router.replace('/workspace')
+        router.push('/workspace')
       })
       .catch((error) => {
         if (__DEV__) {

@@ -49,7 +49,7 @@ async function handleSubmit() {
   try {
     const res = await bindMenuToRole({
       roleId: currentRole.value.id,
-      menuIds: treeRef.value.getCheckedKeys(true),
+      menuIds: treeRef.value.getHalfCheckedKeys().concat(treeRef.value.getCheckedKeys()),
     })
 
     if (res.code === CODE.SUCCESS) {
