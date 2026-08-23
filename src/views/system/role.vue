@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Delete, Edit, Plus, Refresh, Search } from '@element-plus/icons-vue'
+import { Delete, Edit, Menu, Plus, Refresh, Search } from '@element-plus/icons-vue'
 import {
   ElButton,
   ElDatePicker,
@@ -15,6 +15,7 @@ import { deleteRoleById, getRolePage } from '@/api/role.ts'
 import { CODE } from '@/common/code.ts'
 import type { FormItemConfig } from '@/components/FormBuilder.vue'
 import FormBuilder from '@/components/FormBuilder.vue'
+import AssignMenuDialog from '@/components/system/role/AssignMenuDialog.vue'
 import CreateDialog from '@/components/system/role/CreateDialog.vue'
 import TableBuilder, { type ColumnConfig, type PageQuery } from '@/components/TableBuilder.vue'
 import type { Role } from '@/schema/role.ts'
@@ -85,7 +86,7 @@ const columns: ColumnConfig[] = [
     prop: 'operation',
     label: '操作',
     align: 'center',
-    width: 280,
+    width: 340,
     slots: {
       default: (scope) => {
         const row = scope.row as Record<string, unknown>
@@ -100,6 +101,17 @@ const columns: ColumnConfig[] = [
               onClick: () => handleEditRow(row),
             },
             () => '编辑',
+          ),
+          h(
+            ElButton,
+            {
+              type: 'primary',
+              link: true,
+              size: 'small',
+              icon: Menu,
+              onClick: () => handleAssignMenu(row),
+            },
+            () => '分配菜单',
           ),
           h(
             ElButton,
@@ -195,6 +207,18 @@ function handleRefresh() {
   // 刷新逻辑
 }
 
+/** 分配菜单弹窗引用 */
+const assignMenuDialogRef =
+  useTemplateRef<InstanceType<typeof AssignMenuDialog>>('assignMenuDialogRef')
+
+/** 行内操作：分配菜单 */
+function handleAssignMenu(row: Record<string, unknown>) {
+  assignMenuDialogRef.value?.open({
+    id: row.id as string,
+    roleName: row.roleName as string,
+  })
+}
+
 /** 行内操作：编辑 */
 function handleEditRow(row: Record<string, unknown>) {
   // 打开编辑弹窗并回显当前行数据
@@ -273,6 +297,7 @@ onBeforeMount(() => {
   </div>
 
   <CreateDialog ref="roleDialogRef" @handle-search="handleSearch" />
+  <AssignMenuDialog ref="assignMenuDialogRef" />
 </template>
 
 <style scoped lang="scss">

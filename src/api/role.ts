@@ -38,4 +38,8 @@ export function deleteRoleById(id: string) {
   return request({ url: '/role/delete', method: 'DELETE', params: { id } })
 }
 
+export function bindMenuToRole(data: { roleId: string; menuIds: (string | number)[] }) {
+  return request({ url: '/role-menu/create', method: 'POST', data })
+}
+
 export type { Role, RoleDTO, RoleQuery }
