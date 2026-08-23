@@ -32,8 +32,12 @@ async function open(role: { id: string; roleName: string }) {
     menuTree.value = buildTree(res.data ?? [])
     await nextTick()
 
-    const { data: checkedKeys } = await getMenuIdsByRoleId(role.id)
-    treeRef.value?.setCheckedKeys(checkedKeys ?? [], false)
+    const topMenuIds = new Set<string>(menuTree.value.map((menu) => menu.id))
+
+    const { data } = await getMenuIdsByRoleId(role.id)
+    const checkedKeys = (data ?? []).filter((id: string) => !topMenuIds.has(id))
+
+    treeRef.value?.setCheckedKeys(checkedKeys, false)
   } finally {
     loading.value = false
   }
