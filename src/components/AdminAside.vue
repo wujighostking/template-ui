@@ -17,12 +17,14 @@ import {
   Tools,
   User,
 } from '@element-plus/icons-vue'
-import { type Component, computed, onBeforeMount, shallowRef } from 'vue'
+import { storeToRefs } from 'pinia'
+import { type Component, computed, onBeforeMount, shallowRef, toRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { getMenu } from '@/api/menu.ts'
 import { CODE } from '@/common/code.ts'
 import type { MenuItem } from '@/schema/adminAside.ts'
+import useMenuStore from '@/store/menu.ts'
 import { buildMenuTree } from '@/utils/menu.ts'
 
 const router = useRouter()
@@ -30,20 +32,24 @@ const route = useRoute()
 
 const activeMenu = computed(() => route.path)
 
-const menus = shallowRef<MenuItem[]>([
-  // {
-  //   path: '/system',
-  //   menuName: '系统管理',
-  //   icon: 'Setting',
-  //   children: [
-  //     { path: '/system/user', menuName: '用户管理', icon: 'User' },
-  //     { path: '/system/role', menuName: '角色管理', icon: 'Key' },
-  //     { path: '/system/menu', menuName: '菜单管理', icon: 'MenuIcon' },
-  //     { path: '/system/dict', menuName: '字典管理', icon: 'Notebook' },
-  //   ],
-  // },
+const menuStore = useMenuStore()
 
-])
+const { menus } = storeToRefs(menuStore)
+
+//   shallowRef<MenuItem[]>([
+//   // {
+//   //   path: '/system',
+//   //   menuName: '系统管理',
+//   //   icon: 'Setting',
+//   //   children: [
+//   //     { path: '/system/user', menuName: '用户管理', icon: 'User' },
+//   //     { path: '/system/role', menuName: '角色管理', icon: 'Key' },
+//   //     { path: '/system/menu', menuName: '菜单管理', icon: 'MenuIcon' },
+//   //     { path: '/system/dict', menuName: '字典管理', icon: 'Notebook' },
+//   //   ],
+//   // },
+//
+// ])
 
 const icons: Record<string, Component> = {
   Setting,
@@ -69,11 +75,13 @@ function handleMenuSelect(index: string) {
 }
 
 onBeforeMount(() => {
-  getMenu().then((res) => {
-    if (res.code === CODE.SUCCESS) {
-      menus.value = buildMenuTree(res.data ?? [])
-    }
-  })
+  menuStore.getNewMenus()
+
+  // getMenu().then((res) => {
+  //   if (res.code === CODE.SUCCESS) {
+  //     menus.value = buildMenuTree(res.data ?? [])
+  //   }
+  // })
 })
 </script>
 

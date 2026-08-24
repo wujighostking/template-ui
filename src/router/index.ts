@@ -6,6 +6,7 @@ import { CODE } from '@/common/code.ts'
 import { whiteList } from '@/common/constants'
 import { addRoutes } from '@/router/routesHandler.ts'
 import type { Role } from '@/schema/role.ts'
+import useMenuStore from '@/store/menu.ts'
 import { isEmpty } from '@/utils'
 import { getStorage, getToken, removeStorage, setStorage } from '@/utils/storage'
 import { isArray } from '@/utils/types.ts'
@@ -158,10 +159,11 @@ function getRole(roles: Role[]) {
   )
   return role
 }
-// todo: 更新角色的信息，避免验证不通过
 function setRole(userInfo: any, newRoles: Role[], key = 'userInfo') {
   userInfo.role = newRoles
   setStorage(key, JSON.stringify(userInfo))
+
+  useMenuStore().getNewMenus()
 }
 
 export { router as default }

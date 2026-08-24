@@ -16,16 +16,19 @@ importers:
         version: 66.7.5
       axios:
         specifier: ^1.19.0
-        version: 1.19.0(debug@4.4.3)
+        version: 1.19.0
       element-plus:
         specifier: ^2.14.4
         version: 2.14.4(vue@3.5.41(typescript@6.0.3))
+      pinia:
+        specifier: ^4.0.3
+        version: 4.0.3(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.41(typescript@6.0.3))
       vue:
         specifier: ^3.5.41
         version: 3.5.41(typescript@6.0.3)
       vue-router:
         specifier: ^5.2.0
-        version: 5.2.0(@vue/compiler-sfc@3.5.41)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.2.0)(jiti@2.7.0)(sass@1.102.0)(yaml@2.9.0))(vue@3.5.41(typescript@6.0.3))
+        version: 5.2.0(@vue/compiler-sfc@3.5.41)(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.41(typescript@6.0.3)))(rolldown@1.2.3)(vite@8.2.1(@types/node@26.2.0)(jiti@2.7.0)(sass@1.102.0)(yaml@2.9.0))(vue@3.5.41(typescript@6.0.3))
     devDependencies:
       '@commitlint/cli':
         specifier: ^21.2.1
@@ -1976,6 +1979,16 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
+  pinia@4.0.3:
+    resolution: {integrity: sha512-XMQqpvjgG7LMqVhhFUzKLT4KEbsYbfZZ0CZU9PgdFm1O2VKBmIkykL8+SfNhOaT7sR0wT6BEgKT0YNDYWgmVRA==}
+    peerDependencies:
+      '@vue/devtools-api': ^8.1.5
+      typescript: '>=5.6.0'
+      vue: ^3.5.11
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   pkg-types@1.3.1:
     resolution: {integrity: sha512-/Jm5M4RvtBFVkKWRu2BLUTNP8/M2a+UwuAX+ae4770q1qVGtfjG+WTCupoZixokjmHiry8uI+dlY8KXYV5HVVQ==}
 
@@ -3603,9 +3616,9 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios@1.19.0(debug@4.4.3):
+  axios@1.19.0:
     dependencies:
-      follow-redirects: 1.16.0(debug@4.4.3)
+      follow-redirects: 1.16.0
       form-data: 4.0.6
       https-proxy-agent: 5.0.1
       proxy-from-env: 2.1.0
@@ -3809,9 +3822,7 @@ snapshots:
     optionalDependencies:
       picomatch: 4.0.5
 
-  follow-redirects@1.16.0(debug@4.4.3):
-    optionalDependencies:
-      debug: 4.4.3
+  follow-redirects@1.16.0: {}
 
   form-data@4.0.6:
     dependencies:
@@ -4220,6 +4231,14 @@ snapshots:
 
   pidtree@1.0.0: {}
 
+  pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.41(typescript@6.0.3)):
+    dependencies:
+      '@vue/devtools-api': 8.2.1
+      nostics: 1.2.0
+      vue: 3.5.41(typescript@6.0.3)
+    optionalDependencies:
+      typescript: 6.0.3
+
   pkg-types@1.3.1:
     dependencies:
       confbox: 0.1.8
@@ -4572,7 +4591,7 @@ snapshots:
 
   vue-component-type-helpers@3.3.9: {}
 
-  vue-router@5.2.0(@vue/compiler-sfc@3.5.41)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.2.0)(jiti@2.7.0)(sass@1.102.0)(yaml@2.9.0))(vue@3.5.41(typescript@6.0.3)):
+  vue-router@5.2.0(@vue/compiler-sfc@3.5.41)(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.41(typescript@6.0.3)))(rolldown@1.2.3)(vite@8.2.1(@types/node@26.2.0)(jiti@2.7.0)(sass@1.102.0)(yaml@2.9.0))(vue@3.5.41(typescript@6.0.3)):
     dependencies:
       '@babel/generator': 8.0.0
       '@vue-macros/common': 3.1.4(vue@3.5.41(typescript@6.0.3))
@@ -4595,6 +4614,7 @@ snapshots:
       yaml: 2.9.0
     optionalDependencies:
       '@vue/compiler-sfc': 3.5.41
+      pinia: 4.0.3(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.41(typescript@6.0.3))
       vite: 8.2.1(@types/node@26.2.0)(jiti@2.7.0)(sass@1.102.0)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@farmfe/core'
