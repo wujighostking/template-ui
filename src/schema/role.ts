@@ -21,6 +21,8 @@ export interface Role {
   updateTime?: string
   /** 逻辑删除标识：0 未删除，1 已删除 */
   deleted?: number
+  /** 版本号 */
+  version?: number
   /** 允许后端扩展其它未知字段 */
   [key: string]: unknown
 }
