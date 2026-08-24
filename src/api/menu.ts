@@ -5,8 +5,8 @@ export function createMenu(data: MenuDTO) {
   return request({ url: '/menu/create', method: 'POST', data })
 }
 
-export function getMenu() {
-  return request({ url: '/menu/list', method: 'GET' }, false)
+export function getMenu(params?: { userId: string }) {
+  return request({ url: '/menu/list', method: 'GET', params }, false)
 }
 
 export function getTopMenu() {

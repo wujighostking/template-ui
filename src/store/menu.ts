@@ -5,12 +5,14 @@ import { getMenu } from '@/api/menu.ts'
 import { CODE } from '@/common/code.ts'
 import type { MenuItem } from '@/schema/adminAside.ts'
 import { buildMenuTree } from '@/utils/menu.ts'
+import { getStorage } from '@/utils/storage.ts'
 
 const useMenuStore = defineStore('menu', () => {
   const menus = shallowRef<MenuItem[]>()
 
   const getNewMenus = () => {
-    getMenu().then((res) => {
+    const userInfo = JSON.parse(getStorage('userInfo') || '{}')
+    getMenu({ userId: userInfo.id }).then((res) => {
       if (res.code === CODE.SUCCESS) {
         menus.value = buildMenuTree(res.data ?? [])
       }
