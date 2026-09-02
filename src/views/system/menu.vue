@@ -7,7 +7,7 @@ import { deleteMenu, getMenu } from '@/api/menu.ts'
 import { CODE } from '@/common/code.ts'
 import type { FormItemConfig } from '@/components/FormBuilder.vue'
 import FormBuilder from '@/components/FormBuilder.vue'
-import CreateDialog from '@/components/system/menu/CreateDialog.vue'
+import CreateMenuDialog from '@/components/system/menu/CreateMenuDialog.vue'
 import TableBuilder, { type ColumnConfig } from '@/components/TableBuilder.vue'
 import type { MenuNode } from '@/schema/menu.ts'
 import { buildTree } from '@/utils'
@@ -102,7 +102,7 @@ const columns: ColumnConfig[] = [
 const tableData = shallowRef<MenuNode[]>([])
 
 /** 新增菜单弹窗引用 */
-const menuDialogRef = useTemplateRef<InstanceType<typeof CreateDialog>>('menuDialogRef')
+const menuDialogRef = useTemplateRef<InstanceType<typeof CreateMenuDialog>>('menuDialogRef')
 
 function handleSearch() {
   // 查询逻辑
@@ -189,7 +189,7 @@ onBeforeMount(() => {
     </el-card>
   </div>
 
-  <CreateDialog ref="menuDialogRef" @handle-search="handleSearch" />
+  <CreateMenuDialog ref="menuDialogRef" @handle-search="handleSearch" />
 </template>
 
 <style scoped lang="scss">

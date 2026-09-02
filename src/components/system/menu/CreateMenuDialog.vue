@@ -1,16 +1,8 @@
-<script setup lang="ts">
-import {
-  ElInput,
-  ElInputNumber,
-  ElMessage,
-  ElOption,
-  ElRadio,
-  ElRadioGroup,
-  ElSelect,
-} from 'element-plus'
-import { computed, h, watch, reactive, ref, shallowRef } from 'vue'
+<script lang="ts" setup>
+import { ElInput, ElInputNumber, ElMessage, ElRadio, ElRadioGroup } from 'element-plus'
+import { computed, h, reactive, ref } from 'vue'
 
-import { createMenu, getTopMenu, updateMenu } from '@/api/menu.ts'
+import { createMenu, updateMenu } from '@/api/menu.ts'
 import { CODE } from '@/common/code.ts'
 import FormBuilder, { type FormItemConfig } from '@/components/FormBuilder.vue'
 import type { MenuDTO, MenuNode } from '@/schema/menu.ts'
@@ -47,8 +39,8 @@ const formData = reactive<MenuDTO>(createDefaultForm())
 /** 表单校验规则 */
 const formRules = {
   menuName: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
-  // name: [{ required: true, message: '请输入组件名称', trigger: 'blur' }],
-  path: [{ required: true, message: '请输入组件路径', trigger: 'blur' }],
+  component: [{ required: true, message: '请输入文件路径', trigger: 'blur' }],
+  path: [{ required: true, message: '请输入组件路由', trigger: 'blur' }],
   status: [{ required: true, message: '请选择状态', trigger: 'change' }],
 }
 
@@ -69,10 +61,10 @@ const formItems: FormItemConfig[] = [
     col: { span: 12 },
   },
   {
-    model: 'path',
-    label: '组件路径',
+    model: 'component',
+    label: '文件路径',
     type: ElInput,
-    props: { placeholder: '如 system/user/index，不填则是菜单', clearable: true },
+    props: { placeholder: '如 system/user/index.vue', clearable: true },
     col: { span: 12 },
   },
   {
@@ -86,6 +78,13 @@ const formItems: FormItemConfig[] = [
           h(ElRadio, { key: item.value, value: item.value }, () => item.label),
         ),
     },
+  },
+  {
+    model: 'path',
+    label: '组件路由',
+    type: ElInput,
+    props: { placeholder: '如 system/user', clearable: true },
+    col: { span: 12 },
   },
   {
     model: 'icon',
@@ -187,10 +186,10 @@ defineExpose({ open, close })
   <el-dialog
     v-model="dialogVisible"
     :title="dialogTitle"
-    width="50%"
+    append-to-body
     destroy-on-close
     draggable
-    append-to-body
+    width="50%"
   >
     <FormBuilder
       ref="formBuilderRef"
@@ -198,8 +197,8 @@ defineExpose({ open, close })
       :form-items="formItems"
       :rowProps="{ gutter: 16 }"
       :rules="formRules"
-      label-width="100px"
       label-position="right"
+      label-width="100px"
     />
 
     <template #footer>
@@ -209,4 +208,4 @@ defineExpose({ open, close })
   </el-dialog>
 </template>
 
-<style scoped lang="scss"></style>
+<style lang="scss" scoped></style>
