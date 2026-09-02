@@ -1,15 +1,18 @@
 <script lang="ts" setup>
 import { ElInput, ElInputNumber, ElMessage, ElRadio, ElRadioGroup } from 'element-plus'
-import { computed, h, reactive, ref } from 'vue'
+import { computed, h, reactive, ref, useTemplateRef } from 'vue'
 
 import { createMenu, updateMenu } from '@/api/menu.ts'
 import { CODE } from '@/common/code.ts'
 import FormBuilder, { type FormItemConfig } from '@/components/FormBuilder.vue'
+import MonacoEditor from '@/components/MonacoEditor/index.vue'
 import type { MenuDTO, MenuNode } from '@/schema/menu.ts'
 
 const emit = defineEmits<{
   (e: 'handleSearch'): void
 }>()
+
+const monacoEditorRef = useTemplateRef('monacoEditor')
 
 /** 状态下拉/单选选项：1-启用 0-禁用 */
 const statusOptions = [
@@ -28,7 +31,7 @@ function createDefaultForm(): MenuDTO {
     component: '',
     name: '',
     url: '',
-    meta: {},
+    meta: undefined,
     status: 0,
     parentId: undefined,
   }
@@ -115,14 +118,8 @@ const formItems: FormItemConfig[] = [
   //   col: { span: 12 },
   // },
   {
-    model: 'meta',
+    model: 'MonacoEditor',
     label: '路由元信息',
-    type: ElInput,
-    props: {
-      type: 'textarea',
-      autosize: { minRows: 2, maxRows: 4 },
-      placeholder: '可填写 JSON 字符串，如 {"title":"用户管理","icon":"User"}',
-    },
     col: { span: 24 },
   },
 ]
@@ -142,7 +139,7 @@ function open(mode: 'add' | 'edit', data?: MenuNode) {
     formData.parentId = data?.id
   }
 
-  formData.meta = JSON.stringify(formData.meta, null, 2)
+  // formData.meta = JSON.stringify(formData.meta, null, 2)
   dialogVisible.value = true
 }
 
@@ -158,6 +155,7 @@ const formBuilderRef = ref<InstanceType<typeof FormBuilder>>()
 async function handleSubmit() {
   if (!formBuilderRef.value) return
   try {
+    formData.meta = monacoEditorRef.value?.getValue()
     await formBuilderRef.value.validate()
     let code, message
 
@@ -199,7 +197,13 @@ defineExpose({ open, close })
       :rules="formRules"
       label-position="right"
       label-width="100px"
-    />
+    >
+      <template #MonacoEditor>
+        <el-form-item v-model="formData.meta" label="路由元信息">
+          <MonacoEditor ref="monacoEditor" v-model="formData.meta" />
+        </el-form-item>
+      </template>
+    </FormBuilder>
 
     <template #footer>
       <el-button @click="close">取 消</el-button>

@@ -8,7 +8,7 @@ export interface MenuDTO {
   component: string
   name: string
   url: string
-  meta: string | Record<string, any>
+  meta: string | undefined
   status: number
   /** 父菜单 ID：null / undefined 表示顶级菜单 */
   parentId: string | null | undefined
