@@ -7,6 +7,10 @@ import { CODE } from '@/common/code.ts'
 import FormBuilder, { type FormItemConfig } from '@/components/FormBuilder.vue'
 import type { User } from '@/schema/user.ts'
 
+defineOptions({
+  name: 'CreateUserDialog',
+})
+
 const emit = defineEmits<{
   (e: 'handleSearch'): void
 }>()

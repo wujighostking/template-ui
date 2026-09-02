@@ -12,7 +12,7 @@ import { isBoolean, isString } from '@/utils/types.ts'
 
 export function createInstance(): AxiosInstance {
   const instance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+    // baseURL: import.meta.env.VITE_API_BASE_URL,
     timeout: 10000,
   })
 
@@ -28,6 +28,14 @@ export function createInstance(): AxiosInstance {
 
   instance.interceptors.request.use(
     (config) => {
+      const url = config.url
+      if (url && !url.startsWith('/api')) {
+        if (!url.startsWith('/')) {
+          config.url = `/${url}`
+        }
+        config.url = `/api${config.url}`
+      }
+
       config.headers['Authorization'] = `Bearer ${getToken()}`
       return config
     },

@@ -16,7 +16,7 @@ import { CODE } from '@/common/code.ts'
 import type { FormItemConfig } from '@/components/FormBuilder.vue'
 import FormBuilder from '@/components/FormBuilder.vue'
 import AssignMenuDialog from '@/components/system/role/AssignMenuDialog.vue'
-import CreateDialog from '@/components/system/role/CreateDialog.vue'
+import CreateRoleDialog from '@/components/system/role/CreateRoleDialog.vue'
 import TableBuilder, { type ColumnConfig, type PageQuery } from '@/components/TableBuilder.vue'
 import type { Role } from '@/schema/role.ts'
 
@@ -193,7 +193,7 @@ function handleCurrentChange(query: PageQuery) {
 }
 
 /** 新增角色弹窗引用 */
-const roleDialogRef = useTemplateRef<InstanceType<typeof CreateDialog>>('roleDialogRef')
+const roleDialogRef = useTemplateRef<InstanceType<typeof CreateRoleDialog>>('roleDialogRef')
 
 function handleAdd() {
   roleDialogRef.value?.open('add')
@@ -296,7 +296,7 @@ onBeforeMount(() => {
     </el-card>
   </div>
 
-  <CreateDialog ref="roleDialogRef" @handle-search="handleSearch" />
+  <CreateRoleDialog ref="roleDialogRef" @handle-search="handleSearch" />
   <AssignMenuDialog ref="assignMenuDialogRef" />
 </template>
 

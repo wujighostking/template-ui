@@ -8,7 +8,7 @@ import { CODE } from '@/common/code.ts'
 import type { FormItemConfig } from '@/components/FormBuilder.vue'
 import FormBuilder from '@/components/FormBuilder.vue'
 import AssignRoleDialog from '@/components/system/user/AssignRoleDialog.vue'
-import CreateDialog from '@/components/system/user/CreateDialog.vue'
+import CreateUserDialog from '@/components/system/user/CreateUserDialog.vue'
 import TableBuilder, { type ColumnConfig, type PageQuery } from '@/components/TableBuilder.vue'
 import type { UserDTO } from '@/schema/user.ts'
 
@@ -160,7 +160,7 @@ function handleReset() {
 }
 
 /** 新增/编辑用户弹窗引用 */
-const userDialogRef = useTemplateRef<InstanceType<typeof CreateDialog>>('userDialogRef')
+const userDialogRef = useTemplateRef<InstanceType<typeof CreateUserDialog>>('userDialogRef')
 
 /** 分配角色弹窗引用 */
 const assignRoleDialogRef =
@@ -279,7 +279,7 @@ onBeforeMount(() => {
       />
     </el-card>
 
-    <CreateDialog ref="userDialogRef" @handle-search="handleSearch" />
+    <CreateUserDialog ref="userDialogRef" @handle-search="handleSearch" />
     <AssignRoleDialog ref="assignRoleDialogRef" @handle-search="handleSearch" />
   </div>
 </template>
