@@ -12,7 +12,7 @@ import { isBoolean, isString } from '@/utils/types.ts'
 
 export function createInstance(): AxiosInstance {
   const instance = axios.create({
-    // baseURL: import.meta.env.VITE_API_BASE_URL,
+    baseURL: '',
     timeout: 10000,
   })
 
