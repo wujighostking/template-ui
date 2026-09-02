@@ -33,6 +33,7 @@ function createDefaultForm(): MenuDTO {
     sort: 1,
     permission: '',
     path: '',
+    component: '',
     name: '',
     url: '',
     meta: {},

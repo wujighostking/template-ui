@@ -5,6 +5,7 @@ export interface MenuDTO {
   sort: number
   permission: string
   path: string
+  component: string
   name: string
   url: string
   meta: string | Record<string, any>

@@ -111,7 +111,7 @@ onBeforeMount(() => {
           </el-menu-item>
         </el-sub-menu>
 
-        <el-menu-item v-else :index="item.id">
+        <el-menu-item v-else :index="item.path" :key="item.id">
           <el-icon v-if="item.icon">
             <component :is="icons[item.icon]" />
           </el-icon>

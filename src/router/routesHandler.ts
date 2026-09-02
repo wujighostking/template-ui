@@ -32,14 +32,13 @@ function handleTopMenu(topMenu: MenuNode[]): RouteRecordRaw[] {
     return {
       id: menu.id,
       name: menu?.name,
-      path: '',
-      component: () => routes[`/src/${menu.path}`]?.(),
+      path: menu.path || '',
+      component: () => routes[`/src/${menu.component}`]?.(),
       children: [],
     }
   })
 }
 
-// todo: 修改为 hashmap 形式
 function handleSubMenu(topMenu: RouteRecordRaw[], subMenu: MenuNode[]): RouteRecordRaw[] {
   subMenu.forEach((menu) => {
     const parentId = menu.parentId
@@ -47,19 +46,19 @@ function handleSubMenu(topMenu: RouteRecordRaw[], subMenu: MenuNode[]): RouteRec
 
     if (null === parentMenu) return
 
-    let path = menu.path
-    if (path?.endsWith('.vue')) {
-      path = path.replace('.vue', '')
-    }
-
-    if (path.startsWith('views')) {
-      path = path.replace('views', '')
-    }
+    // let path =  menu.path
+    // if (path?.endsWith('.vue')) {
+    //   path = path.replace('.vue', '')
+    // }
+    //
+    // if (path.startsWith('views')) {
+    //   path = path.replace('views', '')
+    // }
 
     parentMenu?.children?.push({
       name: menu?.name,
-      path: path,
-      component: () => routes[`/src/${menu.path}`]?.(),
+      path: menu.path,
+      component: () => routes[`/src/${menu.component}`]?.(),
     })
   })
   return topMenu
