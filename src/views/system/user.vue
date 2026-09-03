@@ -1,6 +1,7 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Delete, Edit, Plus, Refresh, Search, UserFilled } from '@element-plus/icons-vue'
-import { ElButton, ElDatePicker, ElInput, ElMessageBox, ElMessage } from 'element-plus'
+import { ElButton, ElDatePicker, ElInput, ElMessage, ElMessageBox } from 'element-plus'
+import { storeToRefs } from 'pinia'
 import { h, onBeforeMount, reactive, ref, shallowRef, useTemplateRef } from 'vue'
 
 import { deleteUserById, getUserPage } from '@/api/user.ts'
@@ -11,6 +12,10 @@ import AssignRoleDialog from '@/components/system/user/AssignRoleDialog.vue'
 import CreateUserDialog from '@/components/system/user/CreateUserDialog.vue'
 import TableBuilder, { type ColumnConfig, type PageQuery } from '@/components/TableBuilder.vue'
 import type { UserDTO } from '@/schema/user.ts'
+import { useUserStore } from '@/store/user.ts'
+
+const userStore = useUserStore()
+const { power } = storeToRefs(userStore)
 
 const searchForm = reactive<{
   username?: string
@@ -172,6 +177,13 @@ function handleAdd() {
 
 /** 行内操作：分配角色 */
 function handleAssignRole(row: UserDTO) {
+  const powers = (row.role ?? []).map((item) => item.power)
+  const _power = Math.min(...powers)
+  if (power.value > _power) {
+    ElMessage.warning('您没有权限分配该用户的角色')
+    return
+  }
+
   assignRoleDialogRef.value?.open(row)
 }
 
@@ -249,7 +261,7 @@ onBeforeMount(() => {
       <p class="user-page__subtitle">管理系统用户账号</p>
     </div>
 
-    <el-card shadow="never" class="user-page__search">
+    <el-card class="user-page__search" shadow="never">
       <FormBuilder
         :form="searchForm"
         :form-items="formItems"
@@ -259,11 +271,11 @@ onBeforeMount(() => {
       />
     </el-card>
 
-    <el-card shadow="never" class="user-page__table">
+    <el-card class="user-page__table" shadow="never">
       <div class="user-page__toolbar">
-        <el-button type="primary" plain :icon="Search" @click="handleSearch">查询</el-button>
-        <el-button type="default" plain :icon="Refresh" @click="handleReset">重置</el-button>
-        <el-button type="primary" :icon="Plus" @click="handleAdd">新增</el-button>
+        <el-button :icon="Search" plain type="primary" @click="handleSearch">查询</el-button>
+        <el-button :icon="Refresh" plain type="default" @click="handleReset">重置</el-button>
+        <el-button :icon="Plus" type="primary" @click="handleAdd">新增</el-button>
         <el-button @click="handleImport">导入</el-button>
         <el-button @click="handleExport">导出</el-button>
         <el-button :icon="Refresh" @click="handleRefresh">刷新</el-button>
@@ -284,7 +296,7 @@ onBeforeMount(() => {
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .user-page {
   display: flex;
   flex-direction: column;

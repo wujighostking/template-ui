@@ -27,6 +27,8 @@ export interface UserDTO {
   updateTime?: string
   /** 逻辑删除标识：0 未删除，1 已删除 */
   deleted?: number
+  /** 用户已分配的角色（列表/详情返回，用于角色列展示与权限级别比较） */
+  role?: Role[]
   /** 允许后端扩展其它未知字段 */
   [key: string]: unknown
 }

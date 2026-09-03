@@ -23,7 +23,7 @@ import type { Role } from '@/schema/role.ts'
 import { useUserStore } from '@/store/user.ts'
 
 const userStore = useUserStore()
-const { userInfo } = storeToRefs(userStore)
+const { userInfo, power } = storeToRefs(userStore)
 
 const searchForm = reactive<{
   roleName?: string
@@ -94,7 +94,7 @@ const columns: ColumnConfig[] = [
     width: 340,
     slots: {
       default: (scope) => {
-        const row = scope.row as Record<string, unknown>
+        const row = scope.row as any
         return h('div', { class: 'row-operation' }, [
           h(
             ElButton,
@@ -110,7 +110,7 @@ const columns: ColumnConfig[] = [
           h(
             ElButton,
             {
-              type: 'primary',
+              type: power.value <= row.power ? 'primary' : 'info',
               link: true,
               size: 'small',
               icon: Menu,
@@ -225,19 +225,11 @@ function getCurrentUserMinPower(): number | undefined {
 
 /** 行内操作：分配菜单（当前用户权限低于目标角色时禁止操作） */
 function handleAssignMenu(row: Record<string, unknown>) {
-  const currentMinPower = getCurrentUserMinPower()
-  if (currentMinPower === undefined) {
-    ElMessage.warning('未获取到当前用户角色信息，无法执行操作')
+  const _power = row.power as number
+  if (_power < power.value) {
+    ElMessage.warning('当前用户权限不足，无法分配菜单给该角色')
     return
   }
-
-  const targetPower = row.power as number | undefined
-  // power 数字越小权限越高：当前用户的最小 power 大于目标角色时，说明权限低于对方
-  if (targetPower !== undefined && currentMinPower > targetPower) {
-    ElMessage.warning('当前用户权限级别低于该角色，无权为其分配菜单')
-    return
-  }
-
   assignMenuDialogRef.value?.open({
     id: row.id as string,
     roleName: row.roleName as string,

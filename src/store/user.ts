@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import type { UserInfo } from '@/schema/user.ts'
 
@@ -8,6 +8,11 @@ export const useUserStore = defineStore(
   () => {
     // @ts-ignore
     const userInfo = ref<UserInfo>({})
+    const power = computed(() => {
+      const powers = userInfo.value?.role?.map((role) => role.power)
+
+      return powers ? Math.min(...powers) : Infinity
+    })
 
     function getUserInfo() {
       return userInfo.value
@@ -18,6 +23,7 @@ export const useUserStore = defineStore(
 
     return {
       userInfo,
+      power,
 
       getUserInfo,
       setUserInfo,
