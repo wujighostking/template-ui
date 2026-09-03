@@ -1,5 +1,6 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Delete, Edit, Plus, Refresh, Search, Sort } from '@element-plus/icons-vue'
+import { Icon } from '@iconify/vue'
 import { ElButton, ElDatePicker, ElInput, ElMessage } from 'element-plus'
 import { h, onBeforeMount, reactive, shallowRef, useTemplateRef } from 'vue'
 
@@ -11,6 +12,7 @@ import CreateMenuDialog from '@/components/system/menu/CreateMenuDialog.vue'
 import TableBuilder, { type ColumnConfig } from '@/components/TableBuilder.vue'
 import type { MenuNode } from '@/schema/menu.ts'
 import { buildTree } from '@/utils'
+import { resolveMenuIcon } from '@/utils/icon'
 
 const searchForm = reactive<Record<string, unknown>>({
   menuName: '',
@@ -44,10 +46,26 @@ const formItems: FormItemConfig[] = [
 
 const columns: ColumnConfig[] = [
   { prop: 'menuName', label: '菜单名称', align: 'center' },
-  { prop: 'icon', label: '图标', align: 'center' },
+  {
+    prop: 'icon',
+    label: '图标',
+    align: 'center',
+    slots: {
+      default: (scope) => {
+        const icon = (scope.row as MenuNode).icon
+        return icon
+          ? h('span', { class: 'cell-icon' }, [
+              h(Icon, { icon: resolveMenuIcon(icon), width: 16, height: 16 }),
+              h('span', icon),
+            ])
+          : h('span', '—')
+      },
+    },
+  },
   { prop: 'sort', label: '排序', align: 'center' },
-  { prop: 'permission', label: '权限标识', align: 'center' },
-  { prop: 'path', label: '组件路径', align: 'center' },
+  // { prop: 'permission', label: '权限标识', align: 'center' },
+  { prop: 'component', label: '文件路径', align: 'center' },
+  { prop: 'path', label: '组件路由', align: 'center' },
   { prop: 'name', label: '组件名称', align: 'center' },
   { prop: '_status', label: '状态', align: 'center' },
   { prop: 'createTime', label: '创建时间', align: 'center' },
@@ -161,7 +179,7 @@ onBeforeMount(() => {
       <p class="menu-page__subtitle">管理菜单权限</p>
     </div>
 
-    <el-card shadow="never" class="menu-page__search">
+    <el-card class="menu-page__search" shadow="never">
       <FormBuilder
         :form="searchForm"
         :form-items="formItems"
@@ -171,20 +189,20 @@ onBeforeMount(() => {
       />
     </el-card>
 
-    <el-card shadow="never" class="menu-page__table">
+    <el-card class="menu-page__table" shadow="never">
       <div class="menu-page__toolbar">
-        <el-button type="primary" plain :icon="Search" @click="handleSearch">查询</el-button>
-        <el-button type="default" plain :icon="Refresh" @click="handleReset">重置</el-button>
-        <el-button type="primary" :icon="Plus" @click="handleAdd()">新增</el-button>
-        <el-button plain :icon="Sort" @click="handleAdjustSort">调整排序</el-button>
+        <el-button :icon="Search" plain type="primary" @click="handleSearch">查询</el-button>
+        <el-button :icon="Refresh" plain type="default" @click="handleReset">重置</el-button>
+        <el-button :icon="Plus" type="primary" @click="handleAdd()">新增</el-button>
+        <el-button :icon="Sort" plain @click="handleAdjustSort">调整排序</el-button>
       </div>
 
       <TableBuilder
         :columns="columns"
         :data="tableData"
-        row-key="id"
-        :tree-props="{ children: 'children' }"
         :default-expand-all="true"
+        :tree-props="{ children: 'children' }"
+        row-key="id"
       />
     </el-card>
   </div>
@@ -192,7 +210,7 @@ onBeforeMount(() => {
   <CreateMenuDialog ref="menuDialogRef" @handle-search="handleSearch" />
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .menu-page {
   display: flex;
   flex-direction: column;
@@ -243,6 +261,21 @@ onBeforeMount(() => {
     align-items: center;
     gap: 8px;
     margin-bottom: 16px;
+  }
+}
+</style>
+
+<style lang="scss">
+/* 图标列：手动 h() 渲染的节点无法命中 scoped，需全局样式 */
+.menu-page .cell-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #475569;
+
+  .iconify {
+    color: #64748b;
   }
 }
 </style>

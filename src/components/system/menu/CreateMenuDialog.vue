@@ -6,6 +6,7 @@ import { createMenu, updateMenu } from '@/api/menu.ts'
 import { CODE } from '@/common/code.ts'
 import FormBuilder, { type FormItemConfig } from '@/components/FormBuilder.vue'
 import MonacoEditor from '@/components/MonacoEditor/index.vue'
+import IconPicker from '@/components/system/menu/IconPicker.vue'
 import type { MenuDTO, MenuNode } from '@/schema/menu.ts'
 
 const emit = defineEmits<{
@@ -92,8 +93,8 @@ const formItems: FormItemConfig[] = [
   {
     model: 'icon',
     label: '菜单图标',
-    type: ElInput,
-    props: { placeholder: '请输入图标名称，如 Setting', clearable: true },
+    type: IconPicker,
+    props: { placeholder: '请选择或输入图标名称，如 ep:setting', clearable: true },
     col: { span: 12 },
   },
   {

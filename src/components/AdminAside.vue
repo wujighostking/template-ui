@@ -1,31 +1,11 @@
-<script setup lang="ts">
-import {
-  BellFilled,
-  Connection,
-  DataLine,
-  DocumentCopy,
-  EditPen,
-  Key,
-  Menu as MenuIcon,
-  Monitor,
-  Notebook,
-  Odometer,
-  OfficeBuilding,
-  Postcard,
-  Setting,
-  Timer,
-  Tools,
-  User,
-} from '@element-plus/icons-vue'
+<script lang="ts" setup>
+import { Icon } from '@iconify/vue'
 import { storeToRefs } from 'pinia'
-import { type Component, computed, onBeforeMount, shallowRef, toRef } from 'vue'
+import { computed, onBeforeMount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { getMenu } from '@/api/menu.ts'
-import { CODE } from '@/common/code.ts'
-import type { MenuItem } from '@/schema/adminAside.ts'
 import useMenuStore from '@/store/menu.ts'
-import { buildMenuTree } from '@/utils/menu.ts'
+import { resolveMenuIcon } from '@/utils/icon'
 
 const router = useRouter()
 const route = useRoute()
@@ -51,25 +31,6 @@ const { menus } = storeToRefs(menuStore)
 //
 // ])
 
-const icons: Record<string, Component> = {
-  Setting,
-  User,
-  Key,
-  MenuIcon,
-  OfficeBuilding,
-  Postcard,
-  Notebook,
-  Monitor,
-  Odometer,
-  BellFilled,
-  Timer,
-  DataLine,
-  Tools,
-  DocumentCopy,
-  EditPen,
-  Connection,
-}
-
 function handleMenuSelect(index: string) {
   router.push(index)
 }
@@ -89,32 +50,26 @@ onBeforeMount(() => {
   <aside class="admin-aside">
     <el-menu
       :default-active="activeMenu"
-      class="admin-menu"
-      background-color="transparent"
-      text-color="#475569"
       active-text-color="#3b82f6"
+      background-color="transparent"
+      class="admin-menu"
+      text-color="#475569"
       @select="handleMenuSelect"
     >
       <template v-for="item in menus" :key="item.id">
         <el-sub-menu v-if="item.children?.length" :index="item.id">
           <template #title>
-            <el-icon v-if="item.icon">
-              <component :is="icons[item.icon]" />
-            </el-icon>
+            <el-icon v-if="item.icon"><Icon :icon="resolveMenuIcon(item.icon)" /></el-icon>
             <span>{{ item.menuName }}</span>
           </template>
           <el-menu-item v-for="child in item.children" :key="child.id" :index="child.path">
-            <el-icon v-if="child.icon">
-              <component :is="icons[child.icon]" />
-            </el-icon>
+            <el-icon v-if="child.icon"><Icon :icon="resolveMenuIcon(child.icon)" /></el-icon>
             <span>{{ child.menuName }}</span>
           </el-menu-item>
         </el-sub-menu>
 
-        <el-menu-item v-else :index="item.path" :key="item.id">
-          <el-icon v-if="item.icon">
-            <component :is="icons[item.icon]" />
-          </el-icon>
+        <el-menu-item v-else :key="item.id" :index="item.path">
+          <el-icon v-if="item.icon"><Icon :icon="resolveMenuIcon(item.icon)" /></el-icon>
           <span>{{ item.menuName }}</span>
         </el-menu-item>
       </template>
@@ -122,7 +77,7 @@ onBeforeMount(() => {
   </aside>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .admin-aside {
   width: 220px;
   background: #fff;
