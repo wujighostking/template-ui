@@ -11,5 +11,5 @@ export function removeStorage(key: string) {
 }
 
 export function getToken() {
-  return JSON.parse(getStorage('userInfo') || '{}')?.token
+  return JSON.parse(getStorage('user') || '{}')?.userInfo?.token
 }

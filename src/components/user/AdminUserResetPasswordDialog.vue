@@ -1,11 +1,12 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Lock } from '@element-plus/icons-vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { storeToRefs } from 'pinia'
 import { reactive, ref } from 'vue'
 
 import { resetPassword } from '@/api/login'
 import { CODE } from '@/common/code.ts'
-import { getStorage } from '@/utils/storage.ts'
+import { useUserStore } from '@/store/user.ts'
 
 /** 修改密码表单数据 */
 interface ResetPasswordForm {
@@ -13,6 +14,9 @@ interface ResetPasswordForm {
   newPassword: string
   confirmPassword: string
 }
+
+const userStore = useUserStore()
+const { userInfo } = storeToRefs(userStore)
 
 function createDefaultForm(): ResetPasswordForm {
   return {
@@ -79,9 +83,9 @@ async function handleSubmit() {
 
   try {
     // 从本地缓存中读取当前登录用户的 id，作为修改密码的入参
-    const userInfo = JSON.parse(getStorage('userInfo') || '{}')
+
     const { code, message } = await resetPassword({
-      id: userInfo.id,
+      id: userInfo.value.id,
       oldPassword: form.oldPassword,
       newPassword: form.newPassword,
     })
@@ -108,29 +112,29 @@ defineExpose({ open, close })
 <template>
   <el-dialog
     v-model="dialogVisible"
-    title="修改密码"
-    width="440px"
+    :close-on-click-modal="false"
+    append-to-body
     destroy-on-close
     draggable
-    append-to-body
-    :close-on-click-modal="false"
+    title="修改密码"
+    width="440px"
   >
     <el-form
       ref="formRef"
       :model="form"
       :rules="rules"
+      class="reset-password-form"
       label-position="left"
       label-width="84px"
-      class="reset-password-form"
       @keyup.enter="handleSubmit"
     >
       <el-form-item label="旧密码" prop="oldPassword">
         <el-input
           v-model="form.oldPassword"
-          type="password"
+          clearable
           placeholder="请输入旧密码"
           show-password
-          clearable
+          type="password"
         >
           <template #prefix>
             <el-icon><Lock /></el-icon>
@@ -141,10 +145,10 @@ defineExpose({ open, close })
       <el-form-item label="新密码" prop="newPassword">
         <el-input
           v-model="form.newPassword"
-          type="password"
+          clearable
           placeholder="请输入新密码"
           show-password
-          clearable
+          type="password"
         >
           <template #prefix>
             <el-icon><Lock /></el-icon>
@@ -155,10 +159,10 @@ defineExpose({ open, close })
       <el-form-item label="确认密码" prop="confirmPassword">
         <el-input
           v-model="form.confirmPassword"
-          type="password"
+          clearable
           placeholder="请再次输入新密码"
           show-password
-          clearable
+          type="password"
         >
           <template #prefix>
             <el-icon><Lock /></el-icon>
@@ -169,12 +173,12 @@ defineExpose({ open, close })
 
     <template #footer>
       <el-button @click="close">取 消</el-button>
-      <el-button type="primary" :loading="loading" @click="handleSubmit">确 定</el-button>
+      <el-button :loading="loading" type="primary" @click="handleSubmit">确 定</el-button>
     </template>
   </el-dialog>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .reset-password-form {
   :deep(.el-form-item__label) {
     font-size: 14px;

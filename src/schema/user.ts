@@ -1,3 +1,5 @@
+import type { Role } from '@/schema/role.ts'
+
 /**
  * 用户信息 DTO（查询、列表、详情返回结构，不包含密码）
  *
@@ -73,5 +75,22 @@ export interface UserQuery {
   /** 创建时间范围 [开始时间, 结束时间] */
   createTime?: string[]
   /** 允许后端扩展其它未知字段 */
+  [key: string]: unknown
+}
+
+/** 用户信息（对应后端登录接口返回结构） */
+export interface UserInfo {
+  id: string
+  nickname?: string
+  username?: string
+  avatar?: string
+  /** 性别：0-未知 1-男 2-女 */
+  gender?: number
+  birthday?: string
+  phoneNumber?: string
+  createTime?: string
+  updateTime?: string
+  role?: Role[]
+  token?: string
   [key: string]: unknown
 }

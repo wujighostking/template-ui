@@ -1,27 +1,13 @@
-<script setup lang="ts">
+<script lang="ts" setup>
+import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 
-import type { Role } from '@/schema/role.ts'
-import { getStorage } from '@/utils/storage.ts'
+import { useUserStore } from '@/store/user.ts'
 
-/** 用户信息（对应后端登录接口 UserDTO 结构） */
-interface UserInfo {
-  id?: number
-  nickname?: string
-  avatar?: string
-  /** 性别：0-未知 1-男 2-女 */
-  gender?: number
-  birthday?: string
-  phoneNumber?: string
-  createTime?: string
-  updateTime?: string
-  role?: Role[]
-  token?: string
-  [key: string]: unknown
-}
+const userStore = useUserStore()
+const { userInfo } = storeToRefs(userStore)
 
 const dialogVisible = ref(false)
-const userInfo = ref<UserInfo>({})
 
 const genderText = computed(() => {
   const map: Record<number, string> = { 0: '未知', 1: '男', 2: '女' }
@@ -39,7 +25,6 @@ const birthdayText = computed(() => userInfo.value.birthday?.slice(0, 10) || '-'
 
 /** 打开弹窗：从本地存储读取用户信息并回显 */
 function open() {
-  userInfo.value = JSON.parse(getStorage('userInfo') || '{}')
   dialogVisible.value = true
 }
 
@@ -53,11 +38,11 @@ defineExpose({ open, close })
 <template>
   <el-dialog
     v-model="dialogVisible"
-    title="用户信息"
-    width="440px"
+    append-to-body
     destroy-on-close
     draggable
-    append-to-body
+    title="用户信息"
+    width="440px"
   >
     <div class="profile">
       <div class="profile__header">
@@ -88,7 +73,7 @@ defineExpose({ open, close })
   </el-dialog>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .profile {
   .profile__header {
     display: flex;

@@ -104,13 +104,13 @@ const formItems: FormItemConfig[] = [
     props: { min: 0, 'controls-position': 'right', style: 'width: 100%' },
     col: { span: 12 },
   },
-  {
-    model: 'permission',
-    label: '权限标识',
-    type: ElInput,
-    props: { placeholder: '如 system:user:list', clearable: true, maxlength: 100 },
-    col: { span: 12 },
-  },
+  // {
+  //   model: 'permission',
+  //   label: '权限标识',
+  //   type: ElInput,
+  //   props: { placeholder: '如 system:user:list', clearable: true, maxlength: 100 },
+  //   col: { span: 12 },
+  // },
   // {
   //   model: 'url',
   //   label: '组件URL',

@@ -1,7 +1,9 @@
 <script lang="ts" setup>
+import { storeToRefs } from 'pinia'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import type { Role } from '@/schema/role.ts'
+import { useUserStore } from '@/store/user.ts'
 import { getStorage, setStorage } from '@/utils/storage.ts'
 
 /** 登录会话记录：用于在本地累计登录次数并记录上次登录时间 */
@@ -14,21 +16,11 @@ interface LoginRecord {
   token?: string
 }
 
-/** 用户信息（对应后端登录接口返回结构） */
-interface UserInfo {
-  username?: string
-  nickname?: string
-  avatar?: string
-  phoneNumber?: string
-  createTime?: string
-  role?: Role[]
-  token?: string
-  [key: string]: unknown
-}
+const userStore = useUserStore()
 
 const LOGIN_RECORD_KEY = 'loginRecord'
 
-const userInfo = JSON.parse(getStorage('userInfo') || '{}') as UserInfo
+const { userInfo } = storeToRefs(userStore)
 
 /** 当前时间，每秒刷新一次，用于实时时钟与问候语 */
 const now = ref(new Date())
@@ -67,13 +59,13 @@ const dateText = computed(() => {
 
 const weekText = computed(() => `星期${'日一二三四五六'[now.value.getDay()]}`)
 
-const displayName = computed(() => userInfo.nickname || userInfo.username || '用户')
+const displayName = computed(() => userInfo.value.nickname || userInfo.value.username || '用户')
 
 const avatarText = computed(() => displayName.value.slice(0, 1).toUpperCase())
 
 /** 角色：取权限级别（power 数字最小）最高的角色名 */
 const roleName = computed(() => {
-  const roles = userInfo.role
+  const roles = userInfo.value.role
   if (!roles || roles.length === 0) return ''
   return roles.reduce<Role>((max, role) => (role.power < max.power ? role : max), roles[0]!)
     ?.roleName
@@ -84,7 +76,7 @@ const loginCount = ref(1)
 const lastLogin = ref('')
 
 function refreshLoginRecord() {
-  const token = userInfo.token
+  const token = userInfo.value.token
   if (!token) return
 
   const prev = JSON.parse(getStorage(LOGIN_RECORD_KEY) || 'null') as LoginRecord | null
@@ -110,7 +102,7 @@ const lastLoginText = computed(() => {
   return loginCount.value > 1 ? '—' : '首次登录'
 })
 
-const createTimeText = computed(() => userInfo.createTime?.slice(0, 10) || '—')
+const createTimeText = computed(() => userInfo.value.createTime?.slice(0, 10) || '—')
 
 interface StatItem {
   label: string

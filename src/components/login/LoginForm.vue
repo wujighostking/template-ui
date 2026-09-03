@@ -7,7 +7,9 @@ import { useRouter } from 'vue-router'
 import { login } from '@/api/login'
 import { addRoutes } from '@/router/routesHandler.ts'
 import type { LoginForm } from '@/schema/loginForm'
-import { setStorage } from '@/utils/storage'
+import { useUserStore } from '@/store/user.ts'
+
+const userStore = useUserStore()
 
 const router = useRouter()
 const loginFormRef = ref<FormInstance>()
@@ -44,7 +46,7 @@ function handleLogin() {
       .then((data) => {
         if (data.code !== 0) return
 
-        setStorage('userInfo', JSON.stringify(data.data))
+        userStore.setUserInfo(data.data)
         ElMessage.success(data.message || '登录成功')
 
         return addRoutes()

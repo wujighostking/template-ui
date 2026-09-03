@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { ArrowDown, Lock, SwitchButton, User } from '@element-plus/icons-vue'
 import { ElMessageBox } from 'element-plus'
 import { onBeforeMount, ref, shallowRef } from 'vue'
@@ -7,17 +7,19 @@ import { useRouter } from 'vue-router'
 import { logout } from '@/api/login'
 import AdminUserProfileDialog from '@/components/user/AdminUserProfileDialog.vue'
 import AdminUserResetPasswordDialog from '@/components/user/AdminUserResetPasswordDialog.vue'
-import type { Role } from '@/schema/role.ts'
-import { getStorage, removeStorage } from '@/utils/storage.ts'
+import { useUserStore } from '@/store/user.ts'
+import { removeStorage } from '@/utils/storage.ts'
 
 const profileDialogRef = ref<InstanceType<typeof AdminUserProfileDialog>>()
 const resetPasswordDialogRef = ref<InstanceType<typeof AdminUserResetPasswordDialog>>()
+
+const userStore = useUserStore()
 
 const router = useRouter()
 const roleName = shallowRef<string | undefined>('')
 
 const getMinPowerRoleName = (): string | undefined => {
-  const roles: Role[] = JSON.parse(getStorage('userInfo') || '{}').role
+  const roles = userStore.getUserInfo().role
   if (!roles || roles.length === 0) {
     console.warn('未获取到用户角色信息，请检查登录状态')
 
@@ -96,7 +98,7 @@ const handleCommand = async (command: string) => {
   <AdminUserResetPasswordDialog ref="resetPasswordDialogRef" />
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .admin-user {
   display: flex;
   align-items: center;
