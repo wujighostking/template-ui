@@ -24,6 +24,9 @@ export const useUserStore = defineStore(
     }
   },
   {
-    persist: true,
+    persist: {
+      key: 'user',
+      pick: ['userInfo'],
+    },
   },
 )

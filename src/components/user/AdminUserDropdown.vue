@@ -8,7 +8,6 @@ import { logout } from '@/api/login'
 import AdminUserProfileDialog from '@/components/user/AdminUserProfileDialog.vue'
 import AdminUserResetPasswordDialog from '@/components/user/AdminUserResetPasswordDialog.vue'
 import { useUserStore } from '@/store/user.ts'
-import { removeStorage } from '@/utils/storage.ts'
 
 const profileDialogRef = ref<InstanceType<typeof AdminUserProfileDialog>>()
 const resetPasswordDialogRef = ref<InstanceType<typeof AdminUserResetPasswordDialog>>()
@@ -62,7 +61,7 @@ const handleCommand = async (command: string) => {
   })
     .then(() => logout())
     .then(() => {
-      removeStorage('userInfo')
+      userStore.setUserInfo({} as any)
       router.replace('/login')
     })
 }

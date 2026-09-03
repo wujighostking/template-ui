@@ -7,8 +7,9 @@ import { whiteList } from '@/common/constants'
 import { addRoutes } from '@/router/routesHandler.ts'
 import type { Role } from '@/schema/role.ts'
 import useMenuStore from '@/store/menu.ts'
+import { useUserStore } from '@/store/user.ts'
 import { isEmpty } from '@/utils'
-import { getStorage, getToken, removeStorage, setStorage } from '@/utils/storage'
+import { getToken, removeStorage, setStorage } from '@/utils/storage'
 import { isArray } from '@/utils/types.ts'
 
 const router = createRouter({
@@ -92,13 +93,15 @@ router.beforeEach(async (to) => {
     const data = await checkToken(token!)
     if (data.code != 0) {
       ElMessage.error(data.message ?? '登录已过期，请重新登录')
-      removeStorage('userInfo')
+      removeStorage('user')
       return { path: '/login' }
     }
 
     const newRoles = data.data as Role[]
 
-    const userInfo = JSON.parse(getStorage('userInfo') || '{}')
+    const userStore = useUserStore()
+    const userInfo = userStore.getUserInfo()
+
     const roles = userInfo?.role as Role[]
 
     if (isArray(roles) && isArray(newRoles) && roles?.length !== newRoles?.length) {
