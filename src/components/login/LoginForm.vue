@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { ChatDotRound, ChatLineRound, Check, Iphone, Lock, Postcard } from '@element-plus/icons-vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { reactive, ref } from 'vue'
@@ -50,7 +50,7 @@ function handleLogin() {
         return addRoutes()
       })
       .then(() => {
-        router.push('/workspace')
+        router.push('/')
       })
       .catch((error) => {
         if (__DEV__) {
@@ -92,9 +92,9 @@ function handleThirdPartyLogin(type: string) {
         <el-form-item prop="phoneNumber">
           <el-input
             v-model="form.phoneNumber"
-            placeholder="请输入手机号码"
-            maxlength="11"
             clearable
+            maxlength="11"
+            placeholder="请输入手机号码"
           >
             <template #prefix>
               <el-icon><Iphone /></el-icon>
@@ -103,7 +103,7 @@ function handleThirdPartyLogin(type: string) {
         </el-form-item>
 
         <el-form-item prop="password">
-          <el-input v-model="form.password" type="password" placeholder="请输入密码" show-password>
+          <el-input v-model="form.password" placeholder="请输入密码" show-password type="password">
             <template #prefix>
               <el-icon><Lock /></el-icon>
             </template>
@@ -115,7 +115,7 @@ function handleThirdPartyLogin(type: string) {
           <a class="forgot-link" href="javascript:void(0)">忘记密码？</a>
         </div>
 
-        <el-button type="primary" class="login-btn" :loading="loading" @click="handleLogin">
+        <el-button :loading="loading" class="login-btn" type="primary" @click="handleLogin">
           登 录
         </el-button>
       </el-form>
@@ -145,7 +145,7 @@ function handleThirdPartyLogin(type: string) {
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 /* 右侧表单区 */
 .login-form-wrap {
   flex: 1;
