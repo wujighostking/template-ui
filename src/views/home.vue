@@ -1,41 +1,16 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import type { Role } from '@/schema/role.ts'
 import { useUserStore } from '@/store/user.ts'
-import { getStorage, setStorage } from '@/utils/storage.ts'
-
-/** 登录会话记录：用于在本地累计登录次数并记录上次登录时间 */
-interface LoginRecord {
-  /** 累计登录次数 */
-  count: number
-  /** 上一次会话的登录时间 */
-  lastLogin?: string
-  /** 记录所属会话的 token，用于区分是否为新一次登录 */
-  token?: string
-}
 
 const userStore = useUserStore()
-
-const LOGIN_RECORD_KEY = 'loginRecord'
 
 const { userInfo } = storeToRefs(userStore)
 
 /** 当前时间，每秒刷新一次，用于实时时钟与问候语 */
 const now = ref(new Date())
-let timer: number | undefined
-
-onMounted(() => {
-  timer = window.setInterval(() => {
-    now.value = new Date()
-  }, 1000)
-  refreshLoginRecord()
-})
-
-onBeforeUnmount(() => {
-  if (timer) window.clearInterval(timer)
-})
 
 const pad = (num: number) => String(num).padStart(2, '0')
 
@@ -70,50 +45,6 @@ const roleName = computed(() => {
   return roles.reduce<Role>((max, role) => (role.power < max.power ? role : max), roles[0]!)
     ?.roleName
 })
-
-/** 登录次数与上次登录时间（本地累计） */
-const loginCount = ref(1)
-const lastLogin = ref('')
-
-function refreshLoginRecord() {
-  const token = userInfo.value.token
-  if (!token) return
-
-  const prev = JSON.parse(getStorage(LOGIN_RECORD_KEY) || 'null') as LoginRecord | null
-  // 同一会话（token 未变，如刷新页面）不重复累计
-  if (prev && prev.token === token) {
-    loginCount.value = prev.count
-    lastLogin.value = prev.lastLogin ?? ''
-    return
-  }
-
-  const record: LoginRecord = {
-    count: (prev?.count ?? 0) + 1,
-    lastLogin: prev?.lastLogin,
-    token,
-  }
-  setStorage(LOGIN_RECORD_KEY, JSON.stringify(record))
-  loginCount.value = record.count
-  lastLogin.value = record.lastLogin ?? ''
-}
-
-const lastLoginText = computed(() => {
-  if (lastLogin.value) return lastLogin.value.slice(0, 16)
-  return loginCount.value > 1 ? '—' : '首次登录'
-})
-
-const createTimeText = computed(() => userInfo.value.createTime?.slice(0, 10) || '—')
-
-interface StatItem {
-  label: string
-  value: string
-}
-
-const stats = computed<StatItem[]>(() => [
-  { label: '累计登录', value: `${loginCount.value} 次` },
-  { label: '上次登录', value: lastLoginText.value },
-  { label: '注册时间', value: createTimeText.value },
-])
 </script>
 
 <template>
@@ -135,16 +66,6 @@ const stats = computed<StatItem[]>(() => [
           <p class="hero__slogan">欢迎回到云枢管理平台，祝您度过充实愉快的一天！</p>
         </div>
       </div>
-
-      <!-- 右侧：登录概览 -->
-      <ul class="hero__stats">
-        <li v-for="item in stats" :key="item.label" class="hero__stat">
-          <span :class="{ 'hero__stat-value--sm': item.value.length > 6 }" class="hero__stat-value">
-            {{ item.value }}
-          </span>
-          <span class="hero__stat-label">{{ item.label }}</span>
-        </li>
-      </ul>
     </section>
   </div>
 </template>
@@ -157,8 +78,6 @@ const stats = computed<StatItem[]>(() => [
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 28px;
     width: 100%;
     min-height: 150px;
     padding: 32px 40px;
@@ -250,61 +169,6 @@ const stats = computed<StatItem[]>(() => [
           color: rgba(255, 255, 255, 0.72);
         }
       }
-    }
-
-    .hero__stats {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      gap: 36px;
-      flex-shrink: 0;
-      margin: 0;
-      padding: 0 0 0 32px;
-      list-style: none;
-      border-left: 1px solid rgba(255, 255, 255, 0.3);
-
-      .hero__stat {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 6px;
-
-        .hero__stat-value {
-          font-size: 24px;
-          font-weight: 700;
-          line-height: 1;
-          color: #fff;
-          white-space: nowrap;
-
-          &.hero__stat-value--sm {
-            font-size: 15px;
-            font-weight: 500;
-            letter-spacing: 0.3px;
-          }
-        }
-
-        .hero__stat-label {
-          font-size: 13px;
-          color: rgba(255, 255, 255, 0.85);
-          white-space: nowrap;
-        }
-      }
-    }
-  }
-}
-
-@media (max-width: 1100px) {
-  .home .hero {
-    flex-direction: column;
-    align-items: flex-start;
-
-    .hero__stats {
-      width: 100%;
-      justify-content: space-between;
-      padding: 20px 0 0;
-      border-left: none;
-      border-top: 1px solid rgba(255, 255, 255, 0.3);
     }
   }
 }
